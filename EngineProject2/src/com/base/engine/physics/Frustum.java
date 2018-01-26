@@ -2,10 +2,9 @@ package com.base.engine.physics;
 
 import com.base.engine.rendering.Camera;
 import com.base.engine.rendering.Projection;
-import com.base.math.Matrix4f;
-import com.base.math.Vector3f;
 
-import primitives.BoundingBox;
+import math.Matrix4f;
+import math.Vector3f;
 import primitives.Plane;
 
 public class Frustum {
@@ -32,26 +31,26 @@ public class Frustum {
 	}
 	
 	//1 = contains, 0 = intersects, -1 = doesn't intersect
-	public int contains(BoundingBox b){
-		if(!far.contains(b)) return -1;
-		if(!near.contains(b)) return -1;
-		if(!top.contains(b)) return -1;
-		if(!bot.contains(b)) return -1;
-		if(!left.contains(b)) return -1;
-		if(!right.contains(b)) return -1;
-		return 0;
-	}
-	
-	//It at least intersects
-	public boolean intersects(BoundingBox b){
-		if(!far.contains(b)) return false;
-		if(!near.contains(b)) return false;
-		if(!top.contains(b)) return false;
-		if(!bot.contains(b)) return false;
-		if(!left.contains(b)) return false;
-		if(!right.contains(b)) return false;
-		return true;
-	}
+//	public int contains(BoundingBox b){
+//		if(!far.contains(b)) return -1;
+//		if(!near.contains(b)) return -1;
+//		if(!top.contains(b)) return -1;
+//		if(!bot.contains(b)) return -1;
+//		if(!left.contains(b)) return -1;
+//		if(!right.contains(b)) return -1;
+//		return 0;
+//	}
+//	
+//	//It at least intersects
+//	public boolean intersects(BoundingBox b){
+//		if(!far.contains(b)) return false;
+//		if(!near.contains(b)) return false;
+//		if(!top.contains(b)) return false;
+//		if(!bot.contains(b)) return false;
+//		if(!left.contains(b)) return false;
+//		if(!right.contains(b)) return false;
+//		return true;
+//	}
 	
 	//true = behind or on plane (inside) false = outside of plane
 	public boolean pointPlane(Vector3f pdir, float poff, float x, float y, float z){return pdir.x * x + pdir.y * y + pdir.z * z <= poff;}

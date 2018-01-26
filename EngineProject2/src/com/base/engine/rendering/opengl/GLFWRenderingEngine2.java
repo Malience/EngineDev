@@ -87,7 +87,6 @@ public class GLFWRenderingEngine2 {
 		
 		terrain = new Terrain(-0.5f,-0.5f, GLTexture.createTextures(new String[]{"bricks.png", "mud.png", "gauge.png", "grassTexture.png", "blendMap.png"}, 3));
 		
-		org.joml.Matrix4f jm = new org.joml.Matrix4f().perspective(fov, window.getWidth() / window.getHeight(), .1f, 1000f, true);
 		//org.joml.Matrix4f jm = new org.joml.Matrix4f().ortho(-400, 400, -300, 300, 0.1f, 1000f, false);//.orthographic(fov, window.getWidth() / window.getHeight(), .1f, 1000f);
 	    drenderer = new DeferredRenderer(window.getWidth(), window.getHeight(), true, new Matrix4f().perspective(fov, window.getWidth() / window.getHeight(), .1f, 1000f));
 		//drenderer = new DeferredRenderer(window.getWidth(), window.getHeight(), true, jm.get(Util.createFloatBuffer(16 * 4)));

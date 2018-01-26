@@ -598,7 +598,6 @@ public class Matrix4f {
 		m20 = dirX;		m21 = dirY;		m22 = dirZ;		m23 = -(dirX * posx + dirY * posy + dirZ * posz);
 		m30 = 0f;		m31 = 0f;		m32 = 0f;		m33 = 1f;
 		
-		Compare.assertMat(this, new org.joml.Matrix4f().lookAt(posx, posy, posz, targetx, targety, targetz, 0,1,0));
 		prop = AFFINE;
 		return this;
 	}

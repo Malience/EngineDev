@@ -44,14 +44,15 @@ public class Octree {
 	
 	//Assumes that object is inside bounding box 
 	public static byte getOctant(GameObject o, float centerx, float centery, float centerz){
-		byte octant = 0b0;
-		if(o.collider.minx + o.transform.pos.x >= centerx) octant |= 0b1;
-		else if(o.collider.maxx + o.transform.pos.x > centerx) return -1;	//x-axis
-		if(o.collider.miny + o.transform.pos.y >= centery) octant |= 0b10;
-		else if(o.collider.maxy + o.transform.pos.y > centery) return -1;	//y-axis
-		if(o.collider.minz + o.transform.pos.z >= centerz) octant |= 0b100;
-		else if(o.collider.maxz + o.transform.pos.z > centerz) return -1;	//z-axis
-		return octant;
+//		byte octant = 0b0;
+//		if(o.collider.minx + o.transform.pos.x >= centerx) octant |= 0b1;
+//		else if(o.collider.maxx + o.transform.pos.x > centerx) return -1;	//x-axis
+//		if(o.collider.miny + o.transform.pos.y >= centery) octant |= 0b10;
+//		else if(o.collider.maxy + o.transform.pos.y > centery) return -1;	//y-axis
+//		if(o.collider.minz + o.transform.pos.z >= centerz) octant |= 0b100;
+//		else if(o.collider.maxz + o.transform.pos.z > centerz) return -1;	//z-axis
+//		return octant;
+		return 0;
 	}
 	
 	public int getNextArray(){
@@ -83,7 +84,7 @@ public class Octree {
 	public void get(Frustum f, TContainer t){get(root, f, t);}
 	
 	public boolean get(OctreeNode n, Frustum f, TContainer t){
-		int check = f.contains(n.region);
+		int check = 0;//f.contains(n.region);
 		if(check == 1) {if(!getAll(n, t)) return false;}
 		else if(check == 0){
 			if(n.active_nodes != 0) for(int i = 0; i < 8; i++) 
@@ -96,10 +97,10 @@ public class Octree {
 	public boolean get(TContainer t, int i){for(GameObject o : object_array[i].array) if(o != null) if(!t.add(o.transform)) return false; return true;}
 	public boolean getCheck(Frustum f, TContainer t, int i){
 		if(i < 0) return true;
-		for(GameObject o : object_array[i].array) 
-			if(o != null && f.intersects(o.collider)) 
-				if(!t.add(o.transform)) 
-					return false; 
+//		for(GameObject o : object_array[i].array) 
+//			if(o != null && f.intersects(o.collider)) 
+//				if(!t.add(o.transform)) 
+//					return false; 
 		return true;}
 	
 	public void getAll(TContainer t){for(int i = 0; i < next; i++) for(GameObject o : object_array[i].array) if(o != null) if(!t.add(o.transform)) return;}
@@ -113,7 +114,7 @@ public class Octree {
 	public String toString(){return root.region.toString() + "\n" + object_array.toString();}
 	
 	private class OctreeNode {
-		private BoundingBox region;
+		private AABB region;
 
 		private OctreeNode parent;
 		private OctreeNode[] nodes;
@@ -127,8 +128,8 @@ public class Octree {
 		//Constructors
 		@SuppressWarnings("unused")
 		public OctreeNode(){}
-		public OctreeNode(BoundingBox region){this.region = region;}
-		private OctreeNode(BoundingBox region, int objects){this.region = region; this.objects = objects;}
+		public OctreeNode(AABB region){this.region = region;}
+		private OctreeNode(AABB region, int objects){this.region = region; this.objects = objects;}
 		
 		//Methods
 		public void update(float delta){
@@ -149,10 +150,11 @@ public class Octree {
 			
 			for(int i : movedObjects){
 				OctreeNode current = this;
-				while(!current.region.contains(object_array[objects].array[i])){
-						if(current.parent != null) current = current.parent;
-						else break; //Expand upwards
-				}
+				//TODO: Fix
+//				while(!current.region.contains(object_array[objects].array[i])){
+//						if(current.parent != null) current = current.parent;
+//						else break; //Expand upwards
+//				}
 				
 				if(current == this && this.insertSelf(object_array[objects].array[i])) object_array[objects].remove(i);
 				else {current.insert(object_array[objects].array[i]); object_array[objects].remove(i);}
@@ -160,77 +162,77 @@ public class Octree {
 		}
 		
 		private void insert(GameObject o){
-			if(active_nodes == 0 && this.size() < 1){this.add(o);return;}
-			if (region.maxx - region.minx <= MIN_SIZE && region.maxy - region.miny <= MIN_SIZE && region.maxz - region.minz <= MIN_SIZE){this.add(o); return;}
-			
-			float 	centerx = (region.maxx + region.minx) * 0.5f,
-					centery = (region.maxy + region.miny) * 0.5f,
-					centerz = (region.maxz + region.minz) * 0.5f;
-			
-			byte octant = getOctant(o, 	centerx, centery, centerz);
-			if(octant < 0) this.add(o);
-			else {
-				if(nodes == null) nodes = new OctreeNode[8];
-				if(nodes[octant] == null) nodes[octant] = createNode(getOctantBB(centerx, centery, centerz, octant), o);
-				else nodes[octant].insert(o);
-			}	
+//			if(active_nodes == 0 && this.size() < 1){this.add(o);return;}
+//			if (region.maxx - region.minx <= MIN_SIZE && region.maxy - region.miny <= MIN_SIZE && region.maxz - region.minz <= MIN_SIZE){this.add(o); return;}
+//			
+//			float 	centerx = (region.maxx + region.minx) * 0.5f,
+//					centery = (region.maxy + region.miny) * 0.5f,
+//					centerz = (region.maxz + region.minz) * 0.5f;
+//			
+//			byte octant = getOctant(o, 	centerx, centery, centerz);
+//			if(octant < 0) this.add(o);
+//			else {
+//				if(nodes == null) nodes = new OctreeNode[8];
+//				if(nodes[octant] == null) nodes[octant] = createNode(getOctantBB(centerx, centery, centerz, octant), o);
+//				else nodes[octant].insert(o);
+//			}	
 		}
 		
 		private boolean insertSelf(GameObject o){
-			if(active_nodes == 0 && this.size() < 1) return false;
-			if (region.maxx - region.minx <= MIN_SIZE && region.maxy - region.miny <= MIN_SIZE && region.maxz - region.minz <= MIN_SIZE) return false;
-			
-			float 	centerx = (region.maxx + region.minx) * 0.5f,
-					centery = (region.maxy + region.miny) * 0.5f,
-					centerz = (region.maxz + region.minz) * 0.5f;
-			
-			byte octant = getOctant(o, 	centerx, centery, centerz);
-			if(octant >= 0) {
-				if(nodes == null) nodes = new OctreeNode[8];
-				if(nodes[octant] == null) nodes[octant] = createNode(getOctantBB(centerx, centery, centerz, octant), o);
-				else nodes[octant].insert(o);
-				return true;
-			}
+//			if(active_nodes == 0 && this.size() < 1) return false;
+//			if (region.maxx - region.minx <= MIN_SIZE && region.maxy - region.miny <= MIN_SIZE && region.maxz - region.minz <= MIN_SIZE) return false;
+//			
+//			float 	centerx = (region.maxx + region.minx) * 0.5f,
+//					centery = (region.maxy + region.miny) * 0.5f,
+//					centerz = (region.maxz + region.minz) * 0.5f;
+//			
+//			byte octant = getOctant(o, 	centerx, centery, centerz);
+//			if(octant >= 0) {
+//				if(nodes == null) nodes = new OctreeNode[8];
+//				if(nodes[octant] == null) nodes[octant] = createNode(getOctantBB(centerx, centery, centerz, octant), o);
+//				else nodes[octant].insert(o);
+//				return true;
+//			}
 			return false;
 		}
 		
 		private void buildTree(){
 			if(objects < 0 || object_array[objects].end < 1) return;
-			
-			//check against min-size 
-			if(region.maxx - region.minx <= MIN_SIZE && region.maxy - region.miny <= MIN_SIZE && region.maxz - region.minz <= MIN_SIZE) return;
-			
-			float 	centerx = (region.maxx + region.minx) * 0.5f,
-					centery = (region.maxy + region.miny) * 0.5f,
-					centerz = (region.maxz + region.minz) * 0.5f;
-			
-			int[] octant_objects = new int[]{-1,-1,-1,-1,-1,-1,-1,-1};
-			int i = 0;
-			while(i <= object_array[objects].end){
-				byte octant = getOctant(object_array[objects].array[i], centerx, centery, centerz);
-				if(octant >= 0){
-					if(octant_objects[octant] < 0) octant_objects[octant] = getNextArray(object_array[objects].array[i]);
-					else object_array[octant_objects[octant]].add(object_array[objects].array[i]);
-					object_array[objects].remove(i);
-				}
-				else i++;
-			}
-			
-			for(i = 0; i < 8; i++){
-				if(octant_objects[i] >= 0){
-					if(nodes == null) nodes = new OctreeNode[8];
-					nodes[i] = createNode(getOctantBB(centerx, centery, centerz, i), octant_objects[i]);
-					active_nodes |= 1 << i;
-					nodes[i].buildTree();
-				}
-			}
+//			
+//			//check against min-size 
+//			if(region.maxx - region.minx <= MIN_SIZE && region.maxy - region.miny <= MIN_SIZE && region.maxz - region.minz <= MIN_SIZE) return;
+//			
+//			float 	centerx = (region.maxx + region.minx) * 0.5f,
+//					centery = (region.maxy + region.miny) * 0.5f,
+//					centerz = (region.maxz + region.minz) * 0.5f;
+//			
+//			int[] octant_objects = new int[]{-1,-1,-1,-1,-1,-1,-1,-1};
+//			int i = 0;
+//			while(i <= object_array[objects].end){
+//				byte octant = getOctant(object_array[objects].array[i], centerx, centery, centerz);
+//				if(octant >= 0){
+//					if(octant_objects[octant] < 0) octant_objects[octant] = getNextArray(object_array[objects].array[i]);
+//					else object_array[octant_objects[octant]].add(object_array[objects].array[i]);
+//					object_array[objects].remove(i);
+//				}
+//				else i++;
+//			}
+//			
+//			for(i = 0; i < 8; i++){
+//				if(octant_objects[i] >= 0){
+//					if(nodes == null) nodes = new OctreeNode[8];
+//					nodes[i] = createNode(getOctantBB(centerx, centery, centerz, i), octant_objects[i]);
+//					active_nodes |= 1 << i;
+//					nodes[i].buildTree();
+//				}
+//			}
 			object_array[objects].trim();
 		}
 		
 		private void add(GameObject o){if(objects < 0) objects = getNextArray(); object_array[objects].add(o);}
 		private int size(){return objects < 0 ? 0 : object_array[objects].end + 1;}
 		
-		private OctreeNode createNode(BoundingBox box, int i){
+		private OctreeNode createNode(AABB box, int i){
 			if(i < 0) return null;
 			
 			OctreeNode node = new OctreeNode(box, i);
@@ -238,7 +240,7 @@ public class Octree {
 			return node;
 		}
 		
-		private OctreeNode createNode(BoundingBox box, GameObject o){
+		private OctreeNode createNode(AABB box, GameObject o){
 			if(o == null) return null;
 			OctreeNode node = new OctreeNode(box);
 			node.objects = getNextArray(o);
@@ -246,14 +248,14 @@ public class Octree {
 			return node;
 		}
 		
-		private BoundingBox getOctantBB(float centerx, float centery, float centerz, int octant){
-			BoundingBox box = new BoundingBox();
-			if((octant & (0b1)) == 0){box.maxx = centerx; box.minx = region.minx;}
-			else{box.maxx = region.maxx; box.minx = centerx;}
-			if((octant & (0b10)) == 0){box.maxy = centery; box.miny = region.miny;}
-			else{box.maxy = region.maxy; box.miny = centery;}
-			if((octant & (0b100)) == 0){box.maxz = centery; box.minz = region.minz;}
-			else{box.maxz = region.maxz; box.minz = centerz;}
+		private AABB getOctantBB(float centerx, float centery, float centerz, int octant){
+			AABB box = new AABB();
+//			if((octant & (0b1)) == 0){box.maxx = centerx; box.minx = region.minx;}
+//			else{box.maxx = region.maxx; box.minx = centerx;}
+//			if((octant & (0b10)) == 0){box.maxy = centery; box.miny = region.miny;}
+//			else{box.maxy = region.maxy; box.miny = centery;}
+//			if((octant & (0b100)) == 0){box.maxz = centery; box.minz = region.minz;}
+//			else{box.maxz = region.maxz; box.minz = centerz;}
 			return box;
 		}
 		
