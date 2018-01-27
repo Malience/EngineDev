@@ -33,6 +33,7 @@ out vec4 FragColor;
 uniform sampler2D reflection;
 uniform sampler2D refraction;
 uniform sampler2D dudv;
+uniform float moveFactor;
 
 const float strength = 0.02;
 
@@ -40,15 +41,19 @@ void main()
 {
 	vec2 ndc = (TexCoord0.xy / TexCoord0.w) / 2.0 + 0.5;
 	
-	vec2 dist1 = (texture(dudv, vec2(TexCoord1.x, TexCoord1.y)).rg * 2.0 - 1.0) * strength;
+	vec2 dist1 = (texture(dudv, vec2(TexCoord1.x + moveFactor, TexCoord1.y)).rg * 2.0 - 1.0) * strength;
+	vec2 dist2 = (texture(dudv, vec2(-TexCoord1.x + moveFactor, TexCoord1.y + moveFactor)).rg * 2.0 - 1.0) * strength;
+	vec2 dist = dist1 + dist2;
 	
-	vec2 reflectCoord = vec2(ndc.x, -ndc.y) + dist1;
-	vec2 refractCoord = vec2(ndc.x, ndc.y) + dist1;
+	vec2 reflectCoord = vec2(ndc.x, -ndc.y) + dist;
+	reflectCoord.x = clamp(reflectCoord.x, 0.001, 0.999);
+	reflectCoord.y = clamp(reflectCoord.y, -0.999, -0.001);
+	vec2 refractCoord = clamp(vec2(ndc.x, ndc.y) + dist, 0.001, 0.999);
 	
 	vec4 reflect = texture(reflection, reflectCoord);
 	vec4 refract = texture(refraction, refractCoord);
 	
 	
 	
-	FragColor = texture(dudv, TexCoord1);//mix(reflect, refract, 0.5);
+	FragColor = mix(reflect, refract, 0.5);
 }

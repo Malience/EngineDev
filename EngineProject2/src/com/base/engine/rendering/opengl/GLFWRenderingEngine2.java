@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import com.base.engine.core.CoreEngine;
 import com.base.engine.core.Engine;
 import com.base.engine.core.GameObject;
+import com.base.engine.core.Time;
 import com.base.engine.core.util.Util;
 import com.base.engine.data.Mesh;
 import com.base.engine.data.Resources;
@@ -74,6 +75,8 @@ public class GLFWRenderingEngine2 implements Engine {
 		
 		tex = GLTexture.genTextures(1);
 		GLTexture.createTextures(new String[]{"bricks.png"}, tex, 3);
+		dudv = GLTexture.genTextures(1);
+		GLTexture.createTextures(new String[] {"dudv.jpg"}, dudv, 3);//TODO: GLTexture is controlling the location that textures are at
 		
 		mesh = Resources.loadMesh("dragon.obj");
 		
@@ -102,7 +105,7 @@ public class GLFWRenderingEngine2 implements Engine {
 		persp = new Projection(fov, window.getWidth(), window.getHeight(), .1f, 1000f);//Matrix4f.createPerspective(fov, aspectRatio, .1f, 1000f);
 		
 		terrain = new Terrain(80, 10, -0.5f,-0.5f, GLTexture.createTextures(new String[]{"bricks.png", "mud.png", "gauge.png", "grassTexture.png", "blendMap.png"}, 3));
-		dudv = GLTexture.createTexture("dudv.png");//TODO: GLTexture is controlling the location that textures are at
+		
 		
 		//org.joml.Matrix4f jm = new org.joml.Matrix4f().ortho(-400, 400, -300, 300, 0.1f, 1000f, false);//.orthographic(fov, window.getWidth() / window.getHeight(), .1f, 1000f);
 	    drenderer = new DeferredRenderer(window.getWidth(), window.getHeight(), true, new Matrix4f().perspective(fov, window.getWidth() / window.getHeight(), .1f, 1000f));
@@ -182,7 +185,7 @@ public class GLFWRenderingEngine2 implements Engine {
 		
 		
 	}
-	int dudv;
+	int[] dudv;
 	int reflWidth, reflHeight, refrWidth, refrHeight;
 	int waterRefl, waterReflC, waterReflD, waterRefr, waterRefrC, waterRefrD;
 	WaterTile water;
@@ -269,18 +272,24 @@ public class GLFWRenderingEngine2 implements Engine {
 		GLShader.setUniform(watershader, "reflection", 0);
 		GLShader.setUniform(watershader, "refraction", 1);
 		GLShader.setUniform(watershader, "dudv", 2);
+		move += wave_speed * Time.getDelta();
+		move %= 1;
+		GLShader.setUniform(watershader, "moveFactor", move);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, waterReflC);
 		GL13.glActiveTexture(GL13.GL_TEXTURE1);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, waterRefrC);
 		GL13.glActiveTexture(GL13.GL_TEXTURE2);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, dudv);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex[0]);
 		GLRendering.renderQuad();
 	    
 	    
 		GLVertexArray.unbindVertexArray();
 		window.swapBuffers();
 	}
+	
+	public static float move = 0;
+	public static final float wave_speed = 0.03f;
 	
 	public static void shadows(){drenderer.toggleShadows();}
 	public static void ssao(){drenderer.toggleSSAO();}
