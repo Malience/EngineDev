@@ -259,6 +259,7 @@ public abstract class GLTexture {
 			File file = new File("./res/textures/" + filename);
 			if(file.exists()) image = ImageIO.read(file);
 			else {
+				System.out.println("All hope has failed");
 				try {
 					InputStream in = Class.class.getResourceAsStream("/textures/" + filename);
 					image = ImageIO.read(in);

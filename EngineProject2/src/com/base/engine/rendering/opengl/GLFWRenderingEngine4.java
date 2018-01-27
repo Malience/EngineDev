@@ -114,7 +114,7 @@ public class GLFWRenderingEngine4 {
 	    //drenderer.render(mesh, count, material, transform1);
 	    //drenderer.render(terrain);
 	    drenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
-	    drenderer.renderLighting(view, camera.pos, dlight, 0);
+	    //drenderer.renderLighting(view, camera.pos, dlight, 0);
 		
 	    
 		GLVertexArray.unbindVertexArray();

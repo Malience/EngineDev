@@ -12,10 +12,14 @@ out vec2 TexCoord0;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec4 clip_plane;
 
 void main()
 {
 	vec4 worldPos = model * vec4(position, 1.0f);
+	
+	gl_ClipDistance[0] = dot(worldPos, clip_plane);
+	
     FragPos = worldPos.xyz;
     Normal = transpose(inverse(mat3(model))) * normal;
     TexCoord0 = texCoord0;

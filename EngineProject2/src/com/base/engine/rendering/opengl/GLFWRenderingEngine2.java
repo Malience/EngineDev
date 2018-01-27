@@ -1,7 +1,13 @@
 package com.base.engine.rendering.opengl;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT1;
+import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT2;
+import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
+import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.GL11;
@@ -21,9 +27,15 @@ import com.base.engine.rendering.GLFWWindow;
 import com.base.engine.rendering.MaterialMap;
 import com.base.engine.rendering.PointLight;
 import com.base.engine.rendering.Projection;
+import com.base.engine.data.Shader;
 import com.base.engine.rendering.SpotLight;
 import com.base.engine.rendering.TContainer;
+import com.base.engine.rendering.water.WaterTile;
+
+import math.MathUtil;
 import math.Matrix4f;
+import math.Quaternion;
+
 import com.base.math.Transform;
 import math.Vector3f;
 
@@ -40,6 +52,7 @@ public class GLFWRenderingEngine2 implements Engine {
 	DirectionalLight dlight;
 	static DeferredRenderer drenderer;
 	static Terrain terrain;
+	int watershader;
 	
 	public void start() {
 		window = CoreEngine.window;
@@ -67,6 +80,8 @@ public class GLFWRenderingEngine2 implements Engine {
 		box = Resources.loadMesh("Basic Cube.obj");
 		//box = Resources.loadMesh("capsule.obj");
 		
+		watershader = Resources.loadShader("water.glsl");
+		
 		Vector3f dlightpos = new Vector3f(-2f, 8f,-4f);
 		float size = 20f;
 		//ortho = Matrix4f.createPerspective(45f, 1f, -1.0f, 20f);
@@ -87,6 +102,7 @@ public class GLFWRenderingEngine2 implements Engine {
 		persp = new Projection(fov, window.getWidth(), window.getHeight(), .1f, 1000f);//Matrix4f.createPerspective(fov, aspectRatio, .1f, 1000f);
 		
 		terrain = new Terrain(80, 10, -0.5f,-0.5f, GLTexture.createTextures(new String[]{"bricks.png", "mud.png", "gauge.png", "grassTexture.png", "blendMap.png"}, 3));
+		dudv = GLTexture.createTexture("dudv.png");//TODO: GLTexture is controlling the location that textures are at
 		
 		//org.joml.Matrix4f jm = new org.joml.Matrix4f().ortho(-400, 400, -300, 300, 0.1f, 1000f, false);//.orthographic(fov, window.getWidth() / window.getHeight(), .1f, 1000f);
 	    drenderer = new DeferredRenderer(window.getWidth(), window.getHeight(), true, new Matrix4f().perspective(fov, window.getWidth() / window.getHeight(), .1f, 1000f));
@@ -115,7 +131,63 @@ public class GLFWRenderingEngine2 implements Engine {
 	    
 	    Transform one = new Transform();
 	    transforms.add(transform1);
+	    transforms.add(new Transform(0, 5, 0));
+	    transforms.add(new Transform(0, 5, 10));
+	    transforms.add(new Transform(10, 5, 0));
+	    transforms.add(new Transform(0, 7, 6));
+	    transforms.add(new Transform(1, 1, 6));
+	    water = new WaterTile(0, 0, 0, 80);
+	    
+	    Quaternion q = new Quaternion().rotate(0, 0, 180 * MathUtil.RAD);
+	    
+	    waterTransform = new Matrix4f().translationRotateScale(water.x, water.y, water.z, q.x, q.y, q.z, q.w, water.size, water.size, water.size);
+	    
+	    
+		reflWidth = 320; reflHeight = 180;
+		// Water Reflection
+	    waterRefl = GLFramebuffer.genFramebuffers();
+		
+		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, waterRefl);
+		waterReflC = GLTexture.createColorbufferf(reflWidth, reflHeight);
+		glBindTexture(GL_TEXTURE_2D, waterReflC);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, waterReflC, 0);
+		  
+		GL20.glDrawBuffers(GL_COLOR_ATTACHMENT0);
+		
+		waterReflD = GLFramebuffer.genRenderbuffer();
+		GLFramebuffer.setUpDepthStencilBuffer(waterRefl, waterReflD, reflWidth, reflHeight);
+	    
+		refrWidth = window.getWidth(); refrHeight = window.getHeight();
+		
+		// Water Refraction
+		waterRefr = GLFramebuffer.genFramebuffers();
+		
+		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, waterRefr);
+		waterRefrC = GLTexture.createColorbufferf(refrWidth, refrHeight);
+		glBindTexture(GL_TEXTURE_2D, waterRefrC);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, waterRefrC, 0);
+		  
+		GL20.glDrawBuffers(GL_COLOR_ATTACHMENT0);
+		
+		waterRefrD = GLTexture.genTextures();
+		glBindTexture(GL_TEXTURE_2D, waterRefrD);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT32, refrWidth, refrHeight, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (ByteBuffer) null);
+		GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+		GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+		GL32.glFramebufferTexture(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, waterRefrD, 0);
+		
+		
+		System.out.println(DeferredRenderer.GBUFFER_SHADER);
+		
+		
+		
 	}
+	int dudv;
+	int reflWidth, reflHeight, refrWidth, refrHeight;
+	int waterRefl, waterReflC, waterReflD, waterRefr, waterRefrC, waterRefrD;
+	WaterTile water;
+	Matrix4f waterTransform;
+	Camera camera2 = new Camera();
 	int shader;
 	Matrix4f view;
 	Matrix4f proj;
@@ -124,25 +196,87 @@ public class GLFWRenderingEngine2 implements Engine {
 	public void run() {
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		
+	    GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
+	    
 	    Matrix4f view = camera.getViewMatrix();
 	    
 	    
-	    GLShader.bindProgram(shader);
-		GLShader.setUniformMat4(GL20.glGetUniformLocation(shader, "projection"), proj);
-		GLShader.setUniformMat4(GL20.glGetUniformLocation(shader, "view"), view);
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, material.diffuse);
-		GLShader.setUniformMat4(GL20.glGetUniformLocation(shader, "model"), PhysicsEngine.bodies[0].transform.getTransformation());
-		GLRendering.renderMesh(box.vao, box.indices);
+//	    GLShader.bindProgram(shader);
+//		GLShader.setUniformMat4(GL20.glGetUniformLocation(shader, "projection"), proj);
+//		GLShader.setUniformMat4(GL20.glGetUniformLocation(shader, "view"), view);
+//		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+//		GL11.glBindTexture(GL11.GL_TEXTURE_2D, material.diffuse);
+//		GLShader.setUniformMat4(GL20.glGetUniformLocation(shader, "model"), PhysicsEngine.bodies[0].transform.getTransformation());
+//		GLRendering.renderMesh(box.vao, box.indices);
 		
 		//System.out.println(PhysicsEngine.bodies[0].transform.getTransformation());
-	    //drenderer.prepare(view);
-	    //drenderer.render(mesh, count, material, transform1);
-	    //drenderer.render(terrain);
-	    //drenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
-	    //drenderer.renderLighting(view, camera.pos, dlight, 0);
-		
+	    GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+	    GLShader.bindProgram(DeferredRenderer.TERRAIN_SHADER);
+	    GLShader.setUniformVec4(DeferredRenderer.TERRAIN_SHADER, "clip_plane", 0, 0, 0, 0);
+	    GLShader.bindProgram(DeferredRenderer.GBUFFER_SHADER);
+	    GLShader.setUniformVec4(DeferredRenderer.GBUFFER_SHADER, "clip_plane", 0, 0, 0, 0);
+	    drenderer.prepare(view);
+	    drenderer.render(box.vao, box.indices, material, transform1);
+	    drenderer.render(terrain);
+	    drenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
+	    drenderer.renderLighting(view, camera.pos, dlight, 0, window.getWidth(), window.getHeight());
+	    GLFramebuffer.copyDepthBuffer(drenderer.gdepth, 0, window.getWidth(), window.getHeight());
+	    
+	    //Render ware refraction
+	    
+	    GLFramebuffer.copyDepthBuffer(drenderer.gdepth, 0, window.getWidth(), window.getHeight());
+	    GLShader.bindProgram(DeferredRenderer.TERRAIN_SHADER);
+	    GLShader.setUniformVec4(DeferredRenderer.TERRAIN_SHADER, "clip_plane", 0, -1, 0, water.y);
+	    GLShader.bindProgram(DeferredRenderer.GBUFFER_SHADER);
+	    GLShader.setUniformVec4(DeferredRenderer.GBUFFER_SHADER, "clip_plane", 0, -1, 0, water.y);
+	    drenderer.prepare(view); //This should be perhaps a different camera
+	    drenderer.render(box.vao, box.indices, material, transform1);
+	    drenderer.render(terrain);
+	    drenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
+	    drenderer.renderLighting(view, camera.pos, dlight, waterRefr, refrWidth, refrHeight);
+	    
+	    
+	    //Render water reflection
+	    
+	    float distance = 2 * (camera.pos.y - water.y);
+	    camera2.pos.set(camera.pos).y -= distance;
+	    camera2.pitch = -camera.pitch;
+	    camera2.yaw = camera.yaw;
+	    camera2.hasRotated = true;
+	    camera2.hasMoved = true;
+	    view = camera2.getViewMatrix();
+	    
+	    //GL11.glViewport(0, 0, reflWidth, reflHeight);
+	    GLShader.bindProgram(DeferredRenderer.TERRAIN_SHADER);
+	    GLShader.setUniformVec4(DeferredRenderer.TERRAIN_SHADER, "clip_plane", 0, 1, 0, water.y);
+	    GLShader.bindProgram(DeferredRenderer.GBUFFER_SHADER);
+	    GLShader.setUniformVec4(DeferredRenderer.GBUFFER_SHADER, "clip_plane", 0, 1, 0, water.y);
+	    drenderer.prepare(view); //This should be perhaps a different camera
+	    drenderer.render(box.vao, box.indices, material, transform1);
+	    drenderer.render(terrain);
+	    drenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
+	    drenderer.renderLighting(view, camera2.pos, dlight, waterRefl, reflWidth, reflHeight);
+	    
+	    view = camera.getViewMatrix();
+	    
+	    //Render water
+	    GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+	    GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
+	    GLShader.bindProgram(watershader);
+		GLShader.setUniformMat4(GL20.glGetUniformLocation(watershader, "projection"), proj);
+		GLShader.setUniformMat4(GL20.glGetUniformLocation(watershader, "view"), view);
+		GLShader.setUniformMat4(GL20.glGetUniformLocation(watershader, "model"), waterTransform);
+		GLShader.setUniform(watershader, "reflection", 0);
+		GLShader.setUniform(watershader, "refraction", 1);
+		GLShader.setUniform(watershader, "dudv", 2);
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, waterReflC);
+		GL13.glActiveTexture(GL13.GL_TEXTURE1);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, waterRefrC);
+		GL13.glActiveTexture(GL13.GL_TEXTURE2);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, dudv);
+		GLRendering.renderQuad();
+	    
 	    
 		GLVertexArray.unbindVertexArray();
 		window.swapBuffers();

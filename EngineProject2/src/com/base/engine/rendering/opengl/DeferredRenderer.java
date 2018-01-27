@@ -46,9 +46,9 @@ public class DeferredRenderer {
 	
 	
 	//Shaders
-	private static final int GBUFFER_SHADER = Resources.loadShader("gbuffer.glsl"), SSAO_SHADER = Resources.loadShader("ssao.glsl"), BLUR_SHADER = Resources.loadShader("ssaoblur.glsl");
+	public static final int GBUFFER_SHADER = Resources.loadShader("gbuffer.glsl"), SSAO_SHADER = Resources.loadShader("ssao.glsl"), BLUR_SHADER = Resources.loadShader("ssaoblur.glsl");
 	private static final int GBUFFER_COLOR_SHADER = Resources.loadShader("gbuffercolor.glsl"), LIGHTING_SHADER = Resources.loadShader("gbufferlight2.glsl");
-	private static final int TERRAIN_SHADER = Resources.loadShader("terrain.glsl");
+	public static final int TERRAIN_SHADER = Resources.loadShader("terrain.glsl");
 	private static final int TERRAIN_VIEW_UNIFORM = GL20.glGetUniformLocation(TERRAIN_SHADER, "view"), TERRAIN_MODEL_UNIFORM = GL20.glGetUniformLocation(TERRAIN_SHADER, "model");
 			
 	private static final int GBUFFER_VIEW_UNIFORM = GL20.glGetUniformLocation(GBUFFER_SHADER, "view"), GBUFFER_PROJ_UNIFORM = GL20.glGetUniformLocation(GBUFFER_SHADER, "projection");
@@ -182,7 +182,7 @@ public class DeferredRenderer {
 		GLShader.bindProgram(GBUFFER_SHADER);
 	}
 	
-	public void renderLighting(Matrix4f view, Vector3f viewpos, DirectionalLight dlight, int buffer){
+	public void renderLighting(Matrix4f view, Vector3f viewpos, DirectionalLight dlight, int buffer, int width, int height){
 		if(ssao){
 			//SSAO
 			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, ssaoframebuffer);
@@ -206,6 +206,7 @@ public class DeferredRenderer {
 		}
 	    //LIGHTING
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, buffer);
+		GL11.glViewport(0, 0, width, height);
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	    GLShader.bindProgram(LIGHTING_SHADER);
 	    GLShader.setUniformMat4(LIGHTING_SHADER, "view", view);

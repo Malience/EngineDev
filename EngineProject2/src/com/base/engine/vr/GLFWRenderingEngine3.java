@@ -173,7 +173,7 @@ public class GLFWRenderingEngine3 {
 	    	
 		    drenderer.prepare(view);
 		    drenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
-		    drenderer.renderLighting(view, camera.pos, dlight, 0);
+		    //drenderer.renderLighting(view, camera.pos, dlight, 0);
 		    
 		    window.swapBuffers();
 		    VRCompositor.VRCompositor_PostPresentHandoff();
@@ -183,12 +183,12 @@ public class GLFWRenderingEngine3 {
 		    vrdrenderer.setProjection(VR2.leftEyePerspective);
 		    vrdrenderer.prepare(view);
 		    vrdrenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
-		    vrdrenderer.renderLighting(view, camera.pos, dlight, lefteye.framebuffer);
+		    //vrdrenderer.renderLighting(view, camera.pos, dlight, lefteye.framebuffer);
 		    
 		    vrdrenderer.setProjection(VR2.rightEyePerspective);
 		    vrdrenderer.prepare(view);
 		    vrdrenderer.render(box.vao, box.indices, transforms.next, material, transforms.transforms);
-		    vrdrenderer.renderLighting(view, camera.pos, dlight, righteye.framebuffer);
+		    //vrdrenderer.renderLighting(view, camera.pos, dlight, righteye.framebuffer);
 	    	
 	    	
 	    	Texture lefttexture = Texture.mallocStack(stack);
