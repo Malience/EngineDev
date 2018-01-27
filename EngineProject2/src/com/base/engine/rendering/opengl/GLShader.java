@@ -140,6 +140,7 @@ public abstract class GLShader {
 			default: System.err.println("Shader type unknown!"); return -1;
 			}
 			System.err.println(shaderName + " Shader Compilation Failed!\n" + GL20.glGetShaderInfoLog(shader));
+			System.err.println(shader_code);
 		}
 		return shader;
 	}

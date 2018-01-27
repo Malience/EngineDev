@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
+import com.base.engine.core.Engine;
 import com.base.engine.core.Time;
 import com.base.math.Transform;
 
@@ -13,7 +14,7 @@ import primitives.OBB;
 import primitives.Plane;
 import primitives.Sphere;
 
-public class PhysicsEngine extends Thread
+public class PhysicsEngine extends Thread implements Engine
 {
 	//World world;
 	//ArrayList<Physical> physicalComponents;
@@ -45,6 +46,10 @@ public class PhysicsEngine extends Thread
 	Sphere s = new Sphere(0f, 0f, 0f, 1f);
 	Plane p = new Plane(1f, 1f, 0f, 0f);
 	OBB o = new OBB(1,1,1);
+	
+	public void start() {
+		
+	}
 	
 	public void run() {
 		float delta = Time.getDelta();

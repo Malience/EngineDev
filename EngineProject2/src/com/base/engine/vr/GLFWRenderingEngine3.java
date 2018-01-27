@@ -96,7 +96,7 @@ public class GLFWRenderingEngine3 {
 		
 		persp = new Projection(fov, window.getWidth(), window.getHeight(), .1f, 1000f);//Matrix4f.createPerspective(fov, aspectRatio, .1f, 1000f);
 		
-		terrain = new Terrain(-0.5f,-0.5f, GLTexture.createTextures(new String[]{"bricks.png", "mud.png", "gauge.png", "grassTexture.png", "blendMap.png"}, 3));
+		terrain = new Terrain(80, 10, -0.5f,-0.5f, GLTexture.createTextures(new String[]{"bricks.png", "mud.png", "gauge.png", "grassTexture.png", "blendMap.png"}, 3));
 		
 	    drenderer = new DeferredRenderer(window.getWidth(), window.getHeight(), true, persp.matrix);
 	    

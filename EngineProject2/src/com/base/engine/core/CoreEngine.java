@@ -1,6 +1,12 @@
 package com.base.engine.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
 import com.base.engine.input.GLFWInputEngine;
+import com.base.engine.input.InputContext;
 import com.base.engine.networking.NetworkingEngine;
 import com.base.engine.physics.PhysicsEngine;
 import com.base.engine.physics.PhysicsEngineNew;
@@ -14,37 +20,62 @@ public class CoreEngine implements Engine{
 	boolean running = false;
 	int framesPerSecond = 60;
 	public static GLFWWindow window;
-	public static GLFWRenderingEngine2 renderingEngine;
-	public static GLFWInputEngine input;
+	public static Engine renderingEngine;
+	public static Engine inputEngine;
 	public static NetworkingEngine networkEngine;
-	public static PhysicsEngine physicsEngine;
+	public static Engine physicsEngine;
 	public static Player[] players;
 	public static Player player;
 	
+	private static final String config = "./config/config.cfg";
+	
+	
+	public CoreEngine(Engine renderingEngine, Engine inputEngine, Engine physicsEngine) {
+		CoreEngine.renderingEngine = renderingEngine;
+		CoreEngine.inputEngine = inputEngine;
+		CoreEngine.physicsEngine = physicsEngine;
+	}
 	
 	public void start() {
-		window = new GLFWWindow("test",800,600);
+		int width = -1;
+		int height = -1;
+		try { 
+			Scanner k = new Scanner(new File(config));
+			ArrayList<String> bindings = new ArrayList<String>();
+			while(k.hasNextLine()){
+				String line = k.nextLine().trim().replaceAll("\\s","");
+				String[] splits = line.split("=");
+				if(splits[0].isEmpty() || splits[1].isEmpty()) continue;
+				switch(splits[0]) {
+				case "Window_Width": width = Integer.parseInt(splits[1]); continue;
+				case "Window_Height": height = Integer.parseInt(splits[1]); continue;	
+				}
+			}
+			k.close();
+		} catch (FileNotFoundException e) {System.out.println("Config not found!");}
+		
+		if(width < 0) width = 800;
+		if(height < 0) height = 600;
+		window = new GLFWWindow("test",width,height);
 		
 		players = new Player[20];
 		
 		networkEngine = new NetworkingEngine();
+		
 		networkEngine.start();
 		
-		renderingEngine = new GLFWRenderingEngine2();
 		renderingEngine.start();
 		
 		player = new Player(networkEngine.getColor());
 		networkEngine.setPlayer(player);
-		renderingEngine.camera.translate(player.transform.pos.x, player.transform.pos.y + 5, player.transform.pos.z + 5);
-		renderingEngine.camera.lookAt(player.transform.pos);
 		
-		physicsEngine = new PhysicsEngine();
+		//physicsEngine = new PhysicsEngine();
+		physicsEngine.start();
 		
 		//physicsEngine.terrain = renderingEngine.terrain;
 		//physicsEngine.physicsActivated = CoreEngine.player.transform.pos;
 		
-		input = new GLFWInputEngine();
-		input.start();
+		inputEngine.start();
 		
 		running = true;
 		this.run();
@@ -74,7 +105,7 @@ public class CoreEngine implements Engine{
 			GLFWWindow.pollEvents();
 			
 			//Input
-			input.run();
+			inputEngine.run();
 			
 			physicsEngine.run();
 			
@@ -113,7 +144,7 @@ public class CoreEngine implements Engine{
 	}
 	
 	public static void main(String [] args) {
-		CoreEngine engine = new CoreEngine();
+		CoreEngine engine = new CoreEngine(new GLFWRenderingEngine2(), new GLFWInputEngine(), new PhysicsEngine());
 		engine.start();
 	}
 	

@@ -44,6 +44,9 @@ public class GLFWWindow extends Window{
 	
 	public void setSizeCallback(GLContext context){this.context = context;}
 	public void setCursorPos(float x, float y){glfwSetCursorPos(this.glfw_handle, x, y);}
+	public void setCursorMiddle() {
+		glfwSetCursorPos(this.glfw_handle, this.width/2, this.height/2);
+	}
 	public void lockCursor(){glfwSetInputMode(glfw_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);}
 	public void unlockCursor(){glfwSetInputMode(glfw_handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);}
 	

@@ -52,8 +52,8 @@ public class Camera {
 	public static void moveRight(){if(camera != null) camera.translate(camera.right.x * cameraSpeed * Time.getDelta(), camera.right.y * cameraSpeed * Time.getDelta(), camera.right.z * cameraSpeed * Time.getDelta());}
 	
 	static boolean locked = false;
-	public static void rotateYaw(float x){if(!locked) return; camera.yaw += (.5 - x) * cameraYawSpeed; camera.calculateRotate(); CoreEngine.window.setCursorPos(400, 300);}
-	public static void rotatePitch(float x){if(!locked) return; camera.pitch += (.5 - x) * cameraPitchSpeed; if(camera.pitch > 89) camera.pitch = 89; else if(camera.pitch < -89) camera.pitch = -89; camera.calculateRotate(); CoreEngine.window.setCursorPos(0, 0);}
+	public static void rotateYaw(float x){if(!locked) return; camera.yaw += (.5 - x) * cameraYawSpeed; camera.calculateRotate(); CoreEngine.window.setCursorMiddle();}
+	public static void rotatePitch(float x){if(!locked) return; camera.pitch += (.5 - x) * cameraPitchSpeed; if(camera.pitch > 80) camera.pitch = 80; else if(camera.pitch < -80) camera.pitch = -80; camera.calculateRotate(); CoreEngine.window.setCursorPos(0, 0);}
 	public static void lockCursor(){CoreEngine.window.lockCursor(); locked = true;}
 	public static void unlockCursor(){CoreEngine.window.unlockCursor(); locked = false;}
 }

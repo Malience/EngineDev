@@ -22,14 +22,18 @@ public class Terrain {
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	
 	Transform transform;
+	float world_size = 80;
+	float max_height = 10f;
 	float x, y;
 	int mesh, indices;
 	float[][] heights;
 	int[] textures;
 	
-	public Terrain(float x, float y, int[] textures){
-		this.x = x * SIZE;
-		this.y = y * SIZE;
+	public Terrain(float world_size, float max_height, float x, float y, int[] textures){
+		this.max_height = max_height;
+		this.world_size = world_size;
+		this.x = x * world_size;
+		this.y = y * world_size;
 		
 		transform = new Transform();
 		transform.translate(this.x, 0, this.y);
@@ -41,7 +45,7 @@ public class Terrain {
 	public float getHeight(float x, float y){
 		x -= this.x;
 		y -= this.y;
-		float gridsize = SIZE / (float)(heights.length - 1);
+		float gridsize = world_size / (float)(heights.length - 1);
 		int gridX = (int)Math.floor(x / gridsize);
 		int gridY = (int)Math.floor(y / gridsize);
 		if(gridX >= heights.length - 1 || gridY >= heights.length - 1 || gridX < 0 || gridY < 0) return 0;
@@ -83,9 +87,9 @@ public class Terrain {
 				float jdiv = (float)j/((float)VERTEX_COUNT - 1);
 				float idiv = (float)i/((float)VERTEX_COUNT - 1);
 				heights[j][i] = getHeight(j,i, heightMap);
-				vertices.put(jdiv * SIZE);
+				vertices.put(jdiv * world_size);
 				vertices.put(heights[j][i]);
-				vertices.put(idiv * SIZE);
+				vertices.put(idiv * world_size);
 				
 				float heightl = getHeight(j - 1, i, heightMap);
 				float heightr = getHeight(j + 1, i, heightMap);
@@ -134,11 +138,11 @@ public class Terrain {
 	}
 	
 	public float getHeight(int x, int y, BufferedImage image){
-		if(x < 0 || x >= image.getHeight() || y < 0 || y >= image.getHeight()) return 0;
+		if(x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) return 0;
 		float height = image.getRGB(x, y);
 		height += MAX_PIXEL_COLOR/2f;
 		height /= MAX_PIXEL_COLOR/2f;
-		height *= MAX_HEIGHT;
+		height *= max_height;
 		return height;
 	}
 }

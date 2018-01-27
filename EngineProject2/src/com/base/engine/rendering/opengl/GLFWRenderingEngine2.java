@@ -7,6 +7,7 @@ import java.nio.FloatBuffer;
 import org.lwjgl.opengl.GL11;
 
 import com.base.engine.core.CoreEngine;
+import com.base.engine.core.Engine;
 import com.base.engine.core.GameObject;
 import com.base.engine.core.util.Util;
 import com.base.engine.data.Mesh;
@@ -26,7 +27,7 @@ import math.Matrix4f;
 import com.base.math.Transform;
 import math.Vector3f;
 
-public class GLFWRenderingEngine2 {
+public class GLFWRenderingEngine2 implements Engine {
 	public Camera camera;
 	GLFWWindow window;
 	GLContext context;
@@ -85,7 +86,7 @@ public class GLFWRenderingEngine2 {
 		
 		persp = new Projection(fov, window.getWidth(), window.getHeight(), .1f, 1000f);//Matrix4f.createPerspective(fov, aspectRatio, .1f, 1000f);
 		
-		terrain = new Terrain(-0.5f,-0.5f, GLTexture.createTextures(new String[]{"bricks.png", "mud.png", "gauge.png", "grassTexture.png", "blendMap.png"}, 3));
+		terrain = new Terrain(80, 10, -0.5f,-0.5f, GLTexture.createTextures(new String[]{"bricks.png", "mud.png", "gauge.png", "grassTexture.png", "blendMap.png"}, 3));
 		
 		//org.joml.Matrix4f jm = new org.joml.Matrix4f().ortho(-400, 400, -300, 300, 0.1f, 1000f, false);//.orthographic(fov, window.getWidth() / window.getHeight(), .1f, 1000f);
 	    drenderer = new DeferredRenderer(window.getWidth(), window.getHeight(), true, new Matrix4f().perspective(fov, window.getWidth() / window.getHeight(), .1f, 1000f));

@@ -1,5 +1,6 @@
 package com.base.engine.data;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class Resources {
@@ -10,6 +11,7 @@ public class Resources {
 	public static final String MESH_PATH = "./res/meshes/";
 	public static Mesh loadMesh(String filename) {
 		filename = MESH_PATH + filename;
+		System.out.println(new File(filename).getAbsolutePath());
 		Mesh mesh;
 		if(!meshes.containsKey(filename)) {
 			mesh = new Mesh(filename);

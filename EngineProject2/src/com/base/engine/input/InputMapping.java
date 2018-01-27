@@ -26,42 +26,46 @@ public class InputMapping {
 	private static String[] rangesIndexMap;
 	static long frameTime;
 	
+	public static Stack<ActionPair> actions;
+	public static Stack<ActionPair> states;
+	public static Stack<RangePair> ranges;
+	
 	static void init(){
-		Stack<ActionPair> actions = new Stack<ActionPair>();
-		actions.push(new ActionPair("Jump", (Runnable)() -> System.out.println("Jump!")));
-		actions.push(new ActionPair("ActionTest", (Runnable)() -> {System.out.println("Action Works!");}));
-		actions.push(new ActionPair("LockCursor", Camera::lockCursor));
-		actions.push(new ActionPair("UnlockCursor", Camera::unlockCursor));
-		actions.push(new ActionPair("UseView", GLFWRenderingEngine::useView));
-		actions.push(new ActionPair("Debug", GLFWRenderingEngine::debug));
-		actions.push(new ActionPair("Bloom", GLFWRenderingEngine::bloom));
-		actions.push(new ActionPair("Shadows", GLFWRenderingEngine::shadows));
-		actions.push(new ActionPair("SSAO", GLFWRenderingEngine2::ssao));
-		actions.push(new ActionPair("RaiseFilter", GLFWRenderingEngine::raiseFilter));
-		actions.push(new ActionPair("LowerFilter", GLFWRenderingEngine::lowerFilter));
+		if(actions == null) actions = new Stack<ActionPair>();
+//		actions.push(new ActionPair("Jump", (Runnable)() -> System.out.println("Jump!")));
+//		actions.push(new ActionPair("ActionTest", (Runnable)() -> {System.out.println("Action Works!");}));
+//		actions.push(new ActionPair("LockCursor", Camera::lockCursor));
+//		actions.push(new ActionPair("UnlockCursor", Camera::unlockCursor));
+//		actions.push(new ActionPair("UseView", GLFWRenderingEngine::useView));
+//		actions.push(new ActionPair("Debug", GLFWRenderingEngine::debug));
+//		actions.push(new ActionPair("Bloom", GLFWRenderingEngine::bloom));
+//		actions.push(new ActionPair("Shadows", GLFWRenderingEngine::shadows));
+//		actions.push(new ActionPair("SSAO", GLFWRenderingEngine2::ssao));
+//		actions.push(new ActionPair("RaiseFilter", GLFWRenderingEngine::raiseFilter));
+//		actions.push(new ActionPair("LowerFilter", GLFWRenderingEngine::lowerFilter));
 		
-		Stack<ActionPair> states = new Stack<ActionPair>();
-		states.push(new ActionPair("StateJump", (Runnable)() -> System.out.println("Jumping!")));
-		states.push(new ActionPair("StateTest", (Runnable)() -> {System.out.println("State Works!");}));
-		states.push(new ActionPair("MoveForward", Camera::moveForward));
-		states.push(new ActionPair("MoveBackward", Camera::moveBackward));
-		states.push(new ActionPair("MoveLeft", Camera::moveLeft));
-		states.push(new ActionPair("MoveRight", Camera::moveRight));
-		states.push(new ActionPair("MovePlayerForward", CoreEngine::movePlayerForward));
-		states.push(new ActionPair("MovePlayerBackward", CoreEngine::movePlayerBackward));
-		states.push(new ActionPair("MovePlayerLeft", CoreEngine::movePlayerLeft));
-		states.push(new ActionPair("MovePlayerRight", CoreEngine::movePlayerRight));
-		states.push(new ActionPair("RaiseExposure", GLFWRenderingEngine::raiseExposure));
-		states.push(new ActionPair("LowerExposure", GLFWRenderingEngine::lowerExposure));
-		states.push(new ActionPair("RaiseGamma", GLFWRenderingEngine::raiseGamma));
-		states.push(new ActionPair("LowerGamma", GLFWRenderingEngine::lowerGamma));
+		if(states == null) states = new Stack<ActionPair>();
+//		states.push(new ActionPair("StateJump", (Runnable)() -> System.out.println("Jumping!")));
+//		states.push(new ActionPair("StateTest", (Runnable)() -> {System.out.println("State Works!");}));
+//		states.push(new ActionPair("MoveForward", Camera::moveForward));
+//		states.push(new ActionPair("MoveBackward", Camera::moveBackward));
+//		states.push(new ActionPair("MoveLeft", Camera::moveLeft));
+//		states.push(new ActionPair("MoveRight", Camera::moveRight));
+//		states.push(new ActionPair("MovePlayerForward", CoreEngine::movePlayerForward));
+//		states.push(new ActionPair("MovePlayerBackward", CoreEngine::movePlayerBackward));
+//		states.push(new ActionPair("MovePlayerLeft", CoreEngine::movePlayerLeft));
+//		states.push(new ActionPair("MovePlayerRight", CoreEngine::movePlayerRight));
+//		states.push(new ActionPair("RaiseExposure", GLFWRenderingEngine::raiseExposure));
+//		states.push(new ActionPair("LowerExposure", GLFWRenderingEngine::lowerExposure));
+//		states.push(new ActionPair("RaiseGamma", GLFWRenderingEngine::raiseGamma));
+//		states.push(new ActionPair("LowerGamma", GLFWRenderingEngine::lowerGamma));
 		
-		Stack<RangePair> ranges = new Stack<RangePair>();
-		ranges.push(new RangePair("JumpHeight", (Range)(float f) -> System.out.println("Jump height " + f)));
-		ranges.push(new RangePair("Scroll", GLFWRenderingEngine::changeFov));
-		ranges.push(new RangePair("RangeTest", (Range)(float f) -> System.out.println("Range Works! " + f)));
-		ranges.push(new RangePair("RotateYaw", Camera::rotateYaw));
-		ranges.push(new RangePair("RotatePitch", Camera::rotatePitch));
+		if(ranges == null) ranges = new Stack<RangePair>();
+//		ranges.push(new RangePair("JumpHeight", (Range)(float f) -> System.out.println("Jump height " + f)));
+//		ranges.push(new RangePair("Scroll", GLFWRenderingEngine::changeFov));
+//		ranges.push(new RangePair("RangeTest", (Range)(float f) -> System.out.println("Range Works! " + f)));
+//		ranges.push(new RangePair("RotateYaw", Camera::rotateYaw));
+//		ranges.push(new RangePair("RotatePitch", Camera::rotatePitch));
 		
 		InputMapping.init(actions, states, ranges);
 	}
@@ -118,22 +122,22 @@ public class InputMapping {
 	static void invokeRange(int key, float value){activeRanges.add(key);rangeValues[key] = value;}
 	static void invokeRange(int key){activeRanges.add(key);}
 	
-	private static class ActionPair{
+	public static class ActionPair{
 		private String name;
 		private Runnable action;
-		private ActionPair(String name, Runnable action){
+		public ActionPair(String name, Runnable action){
 			this.name = name;
 			this.action = action;
 		}
 	}
 	
 	@FunctionalInterface
-	private interface Range{void run(float f);}
+	public interface Range{void run(float f);}
 	
-	private static class RangePair{
+	public static class RangePair{
 		private String name;
 		private Range action;
-		private RangePair(String name, Range action){
+		public RangePair(String name, Range action){
 			this.name = name;
 			this.action = action;
 		}
