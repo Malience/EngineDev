@@ -273,7 +273,7 @@ public class GLFWRenderingEngine2 implements Engine {
 		GLShader.setUniform(watershader, "refraction", 1);
 		GLShader.setUniform(watershader, "dudv", 2);
 		move += wave_speed * Time.getDelta();
-		move %= 1;
+		move %= 1; //TODO: Fix Time.getDelta
 		GLShader.setUniform(watershader, "moveFactor", move);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, waterReflC);

@@ -20,9 +20,9 @@ public class Skybox extends GLPass{
 		GLVertexArray.setUpVertexArray(mesh, skyboxVertices);
 	}
 	
-	public void render(Matrix4f view){
+	public void render(Matrix4f view, int framebuffer){
 		glDepthFunc(GL_LEQUAL);
-		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, framebuffer);
 		GLShader.bindProgram(shader);
 		GLShader.setUniformMat4(this.view, view);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);

@@ -21,13 +21,13 @@ public class Terrain {
 	private static final float MIN_HEIGHT = -10f;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	
-	Transform transform;
+	public Transform transform;
 	float world_size = 80;
 	float max_height = 10f;
 	float x, y;
-	int mesh, indices;
+	public int mesh, indices;
 	float[][] heights;
-	int[] textures;
+	public int[] textures;
 	
 	public Terrain(float world_size, float max_height, float x, float y, int[] textures){
 		this.max_height = max_height;

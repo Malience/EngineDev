@@ -224,7 +224,7 @@ public class DeferredRenderer {
 	}
 	
 	//GBuffer
-	int gbuffershader, gbuffer, gposition, gnormal, galbedospec, gdepth;
+	public int gbuffershader, gbuffer, gposition, gnormal, galbedospec, gdepth;
 	public void initGBuffer(){
 		gbuffer = GLFramebuffer.genFramebuffers();
 		
