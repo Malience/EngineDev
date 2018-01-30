@@ -1,29 +1,20 @@
 package com.base.engine.core;
 
-public class Time 
-{
-	private static float last;
-	private static float delta;
+public class Time {
+	private static final long SECOND = 1000000000L;
+	private static final float INV_SECOND = 1.0f / (float) SECOND;
 	
-	static {
-		last = getTime();
-	}
+	private static float last, delta;
 	
-	public static float getDelta() {
-		return delta;
-	}
+	static { last = getTime(); }
+	
+	public static float getDelta() { return delta; }
+	public static float getTime() { return System.nanoTime() * INV_SECOND; }
 	
 	public static float updateDelta() {
 		float time = getTime();
 		delta = time - last;
 		last = time;
 		return delta;
-	}
-	
-	private static final long SECOND = 1000000000L;
-
-	public static float getTime()
-	{
-		return System.nanoTime()/(float)SECOND;
 	}
 }
