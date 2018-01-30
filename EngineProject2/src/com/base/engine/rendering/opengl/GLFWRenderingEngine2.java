@@ -11,6 +11,11 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL32;
 
 import com.base.engine.core.CoreEngine;
 import com.base.engine.core.Engine;
@@ -183,7 +188,7 @@ public class GLFWRenderingEngine2 implements Engine {
 		System.out.println(DeferredRenderer.GBUFFER_SHADER);
 		
 		
-		wave = GLTexture.createTexture("dudv.png");
+		wave = GLTexture.createTexture("dudv_old.png");
 	}
 	int wave;
 	int[] dudv;

@@ -3,6 +3,8 @@ package com.base.engine.rendering.opengl;
 import static org.lwjgl.opengl.GL11.glClear;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL30;
 
 import com.base.engine.rendering.MaterialMap;
 import math.Matrix4f;

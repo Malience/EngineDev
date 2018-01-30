@@ -1,9 +1,14 @@
 package com.base.engine.rendering.opengl;
 
-import static com.base.engine.rendering.opengl.GL11.*;
-import static com.base.engine.rendering.opengl.GL30.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 
 import java.nio.ByteBuffer;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 public abstract class GLFramebuffer {
 	public static int genFramebuffers(){return GL30.glGenFramebuffers();}
@@ -60,7 +65,7 @@ public abstract class GLFramebuffer {
 		
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, buffers[0]);
 		
-		buffers[1] = glGenRenderbuffers();
+		buffers[1] = GL30.glGenRenderbuffers();
 		GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, buffers[1]);
 		GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL11.GL_DEPTH_COMPONENT, width, height);
 		GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_RENDERBUFFER, buffers[1]);

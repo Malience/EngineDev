@@ -5,6 +5,9 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glClear;
 
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL30;
+
 import math.Matrix4f;
 import math.Vector3f;
 
