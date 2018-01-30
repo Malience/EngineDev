@@ -35,7 +35,7 @@ public class Resources {
 		return shader.program;
 	}
 	
-	public static final String TEXTURE_PATH = "./res/textures/";
+	public static final String TEXTURE_PATH = "";//./res/textures/";
 	public static Texture loadTexture(String filename) {
 		filename = TEXTURE_PATH + filename;
 		Texture texture;

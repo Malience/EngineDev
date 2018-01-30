@@ -21,25 +21,16 @@ import com.base.engine.rendering.opengl.GLFWRenderingEngine2;
 import com.base.engine.vr.GLFWRenderingEngine3;
 import com.base.engine.vr.VR2;
 
-public class CoreEngine implements Engine{
-	boolean running = false;
-	int framesPerSecond = 60;
+public class CoreEngine implements Engine {
+	private boolean running = false;
+	private int framesPerSecond = 60;
 	public static GLFWWindow window;
-	public static Engine renderingEngine;
-	public static Engine inputEngine;
-	public static NetworkingEngine networkEngine;
-	public static Engine physicsEngine;
-	public static Player[] players;
-	public static Player player;
+	private static Engine engines[];
 	
 	private static final String config = "./config/config.cfg";
 	
 	
-	public CoreEngine(Engine renderingEngine, Engine inputEngine, Engine physicsEngine) {
-		CoreEngine.renderingEngine = renderingEngine;
-		CoreEngine.inputEngine = inputEngine;
-		CoreEngine.physicsEngine = physicsEngine;
-	}
+	public CoreEngine(Engine engines[]) {this.engines = engines;}
 	
 	public void start() {
 		int width = -1;
@@ -63,56 +54,31 @@ public class CoreEngine implements Engine{
 		if(height < 0) height = 600;
 		window = new GLFWWindow("test",width,height);
 		
-		players = new Player[20];
+		for(int i = 0; i < engines.length; i++) {
+			engines[i].start();
+		}
 		
-		networkEngine = new NetworkingEngine();
-		
-		networkEngine.start();
-		
-		renderingEngine.start();
-		
-		player = new Player(networkEngine.getColor());
-		networkEngine.setPlayer(player);
-		
-		//physicsEngine = new PhysicsEngine();
-		physicsEngine.start();
-		
-		//physicsEngine.terrain = renderingEngine.terrain;
-		//physicsEngine.physicsActivated = CoreEngine.player.transform.pos;
-		
-		inputEngine.start();
-		
-		running = true;
-		this.run();
-		this.dispose();
 	}
 	
 	public void run() {
-		Time.init();
+		running = true;
 		int frames = 0;
 		float frameTime = 1.0f / framesPerSecond;
-		float delta;
-		float unprocessedTime = 0f;
-		float frameCounter = 0f;
+		float delta, unprocessedTime = 0f, frameCounter = 0f;;
 		//glfwFreeCallbacks(window);
+		float current, last = Time.getTime();
 		
 		while(running && !window.shouldClose()) {
 			//frame start
 			
 			boolean render = false;
 			
-			delta = Time.updateDelta();
+			current = Time.getTime();
+			delta = current - last;
+			last = current;
 			
 			unprocessedTime += delta;
 			frameCounter += delta;
-			
-			//Poll window events
-			GLFWWindow.pollEvents();
-			
-			//Input
-			inputEngine.run();
-			
-			physicsEngine.run();
 			
 			//frame end
 			while(unprocessedTime >= frameTime)
@@ -134,58 +100,21 @@ public class CoreEngine implements Engine{
 				}	
 			}
 			if(render) {
+				Time.updateDelta();
 				
-				//networkEngine.run();
-				renderingEngine.run();
+				
+				//Poll window events
+				GLFWWindow.pollEvents();
+				
+				for(int i = 0; i < engines.length; i++) engines[i].run();
 				frames++;}
 			else{try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 		}
+		this.dispose();
 	}
 	
 	public void dispose() {
-		networkEngine.dispose();
+		for(int i = 0; i < engines.length; i++) engines[i].dispose();
 		window.dispose();
-		//VR2.stop();
-	}
-	
-	public static void main(String [] args) {
-		CoreEngine engine = new CoreEngine(new GLFWRenderingEngine2(), new GLFWInputEngine(), new PhysicsEngine());
-		
-		Stack<ActionPair> actions = InputMapping.actions = new Stack<ActionPair>();
-		
-		actions.push(new ActionPair("LockCursor", Camera::lockCursor));
-		actions.push(new ActionPair("UnlockCursor", Camera::unlockCursor));
-		
-		Stack<ActionPair> states = InputMapping.states = new Stack<ActionPair>();
-		
-		states.push(new ActionPair("MoveForward", Camera::moveForward));
-		states.push(new ActionPair("MoveBackward", Camera::moveBackward));
-		states.push(new ActionPair("MoveLeft", Camera::moveLeft));
-		states.push(new ActionPair("MoveRight", Camera::moveRight));
-		
-		Stack<RangePair> ranges = InputMapping.ranges = new Stack<RangePair>();
-		
-		ranges.push(new RangePair("RotateYaw", Camera::rotateYaw));
-		ranges.push(new RangePair("RotatePitch", Camera::rotatePitch));
-		
-		engine.start();
-	}
-	
-	static float moveSpeed = 15.0f;
-	
-	public static void movePlayerForward(){
-		player.transform.translate(0, 0, -moveSpeed * Time.getDelta());
-	}
-	
-	public static void movePlayerBackward(){
-		player.transform.translate(0, 0, moveSpeed * Time.getDelta());
-	}
-	
-	public static void movePlayerLeft(){
-		player.transform.translate(-moveSpeed * Time.getDelta(), 0, 0);
-	}
-	
-	public static void movePlayerRight(){
-		player.transform.translate(moveSpeed * Time.getDelta(), 0, 0);
 	}
 }

@@ -48,6 +48,10 @@ public class GLFWInputEngine extends InputEngine {
 		InputMapping.invokeCallbacks();
 	}
 	
+	public void dispose() {
+		
+	}
+	
 	public void enableJoysticks(){joysticks_enabled = true; GLFWJoystick.init();}
 	public void disableJoysticks(){joysticks_enabled = false;}
 }

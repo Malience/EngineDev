@@ -121,6 +121,10 @@ public class PhysicsEngine extends Thread implements Engine
 		ContactList.reset();
 	}
 	
+	public void dispose() {
+		
+	}
+	
 	//TODO: ForceGenerators
 //	public static void addForce(RigidBody body, String forceName)
 //	{

@@ -2,10 +2,10 @@ package com.base.engine.core;
 
 public class Time 
 {
-	private static double last;
+	private static float last;
 	private static float delta;
 	
-	public static void init() {
+	static {
 		last = getTime();
 	}
 	
@@ -14,16 +14,16 @@ public class Time
 	}
 	
 	public static float updateDelta() {
-		double time = getTime();
-		delta = (float) (time - last);
+		float time = getTime();
+		delta = time - last;
 		last = time;
 		return delta;
 	}
 	
 	private static final long SECOND = 1000000000L;
 
-	public static double getTime()
+	public static float getTime()
 	{
-		return (double)System.nanoTime()/(double)SECOND;
+		return System.nanoTime()/(float)SECOND;
 	}
 }

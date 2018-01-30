@@ -286,8 +286,8 @@ public abstract class GLTexture {
 	                buffer.put((byte) ((pixel) & 0xFF));
 	                if(alpha[0])
 	                	buffer.put((byte) ((pixel >> 24) & 0xFF));
-	                else
-	                	buffer.put((byte)(0xFF));
+	                //else
+	                //	buffer.put((byte)(0xFF));
 	            }
 	        }
 	        buffer.flip();

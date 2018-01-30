@@ -183,8 +183,9 @@ public class GLFWRenderingEngine2 implements Engine {
 		System.out.println(DeferredRenderer.GBUFFER_SHADER);
 		
 		
-		
+		wave = GLTexture.createTexture("dudv.png");
 	}
+	int wave;
 	int[] dudv;
 	int reflWidth, reflHeight, refrWidth, refrHeight;
 	int waterRefl, waterReflC, waterReflD, waterRefr, waterRefrC, waterRefrD;
@@ -280,12 +281,16 @@ public class GLFWRenderingEngine2 implements Engine {
 		GL13.glActiveTexture(GL13.GL_TEXTURE1);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, waterRefrC);
 		GL13.glActiveTexture(GL13.GL_TEXTURE2);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, tex[0]);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, wave);
 		GLRendering.renderQuad();
 	    
 	    
 		GLVertexArray.unbindVertexArray();
 		window.swapBuffers();
+	}
+	
+	public void dispose() {
+		
 	}
 	
 	public static float move = 0;

@@ -45,6 +45,14 @@ public class Transform {
 		remakeTransformation();
 	}
 	
+	public Transform(float x, float y, float z, float rotx, float roty, float rotz, float scale) {
+		pos = new Vector3f(x,y,z);
+		rot = new Quaternion().rotate(rotx, roty, rotz);
+		this.scale = new Vector3f(scale, scale, scale);
+		transformation = new Matrix4f();
+		remakeTransformation();
+	}
+	
 	/**
 	 * Sets fields 
 	 * @param pos Position

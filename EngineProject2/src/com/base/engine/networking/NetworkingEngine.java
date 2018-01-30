@@ -109,7 +109,7 @@ public class NetworkingEngine {
 			if(i == id || playerpos[i] == null) continue;
 			if(listener.getVector(i, networkpos[i])){
 				playerpos[i].lerp(networkpos[i], Time.getDelta() * 10.0f, playerpos[i]);
-				CoreEngine.players[i].transform.applyChanges();
+				//CoreEngine.players[i].transform.applyChanges();
 			}
 		}
 	}
@@ -118,7 +118,7 @@ public class NetworkingEngine {
 		playerpos[id] = new Vector3f();
 		listener.getVector(id, playerpos[id]);
 		networkpos[id] = new Vector3f(playerpos[id]);
-		CoreEngine.players[id] = new Player(playerpos[id], getColor(id));
+		//CoreEngine.players[id] = new Player(playerpos[id], getColor(id));
 		System.out.println("Player " + id + " instantiated!");
 		
 	}
