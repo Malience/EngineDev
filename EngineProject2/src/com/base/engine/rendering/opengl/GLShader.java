@@ -9,6 +9,9 @@ import java.nio.FloatBuffer;
 import java.util.Scanner;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32;
 
 import com.base.engine.core.util.Util;
 import com.base.engine.rendering.DirectionalLight;

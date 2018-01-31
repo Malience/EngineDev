@@ -5,6 +5,8 @@ import static org.lwjgl.opengl.GL11.*;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL30;
 
 import com.base.engine.core.CoreEngine;
 import com.base.engine.core.util.Util;

@@ -3,6 +3,11 @@ package com.base.engine.rendering.opengl;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+
 import com.base.engine.core.util.Util;
 
 public abstract class GLVertexArray {

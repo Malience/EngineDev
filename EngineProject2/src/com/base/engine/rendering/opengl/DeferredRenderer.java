@@ -32,6 +32,9 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.*;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 import com.base.engine.data.Resources;
 import com.base.engine.rendering.DirectionalLight;

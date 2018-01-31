@@ -2,6 +2,9 @@ package com.base.engine.rendering.opengl;
 
 import static org.lwjgl.opengl.GL11.glClear;
 
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+
 import math.Matrix4f;
 
 public class GLPass2 {

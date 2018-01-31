@@ -1,6 +1,6 @@
 package com.base.engine.rendering.opengl;
 
-import static com.base.engine.rendering.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -11,6 +11,10 @@ import java.nio.FloatBuffer;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.EXTTextureFilterAnisotropic;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL30;
 
 import com.base.engine.core.util.Util;
 
