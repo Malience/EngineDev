@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
 import com.base.engine.rendering.Vertex;
@@ -35,6 +36,11 @@ public abstract class Util
 	public static FloatBuffer realloc(FloatBuffer buffer, int size){return MemoryUtil.memRealloc(buffer, size);}
 	public static IntBuffer realloc(IntBuffer buffer, int size){return MemoryUtil.memRealloc(buffer, size);}
 	public static ByteBuffer realloc(ByteBuffer buffer, int size){return MemoryUtil.memRealloc(buffer, size);}
+	
+	
+	public static FloatBuffer malloc(float[] array, MemoryStack stack) {return arrayToBuffer(stack.mallocFloat(array.length), array);}
+	public static IntBuffer malloc(int[] array, MemoryStack stack) {return arrayToBuffer(stack.mallocInt(array.length), array);}
+	public static ByteBuffer malloc(byte[] array, MemoryStack stack) {return arrayToBuffer(stack.malloc(array.length), array);}
 	
 	public static void free(Buffer buffer){MemoryUtil.memFree(buffer);}
 	

@@ -1,12 +1,21 @@
 package com.base.engine.core.util;
 
+import static org.lwjgl.system.MemoryStack.stackPush;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryStack;
 
 import com.base.engine.data.Mesh;
 import com.base.engine.rendering.opengl.GLVertexArray;
+import com.sun.deploy.util.BufferUtil;
 
 public abstract class AssimpUtil {
 	public static FloatBuffer arrayToBuffer(AIVector3D.Buffer array){return arrayToBuffer(Util.createFloatBuffer(array.remaining()*3), array);}
@@ -32,6 +41,13 @@ public abstract class AssimpUtil {
 	public static FloatBuffer arrayToBuffer(FloatBuffer buffer, AIColor4D v)
 	{buffer.put(v.r());buffer.put(v.g());buffer.put(v.b());buffer.put(v.a());buffer.flip();return buffer;}
 	
+	
+	public static FloatBuffer malloc(MemoryStack stack, AIVector3D.Buffer array) {return arrayToBuffer(stack.mallocFloat(array.remaining() * 3), array);}
+	public static FloatBuffer malloc(MemoryStack stack, AIVector2D.Buffer array) {return arrayToBuffer(stack.mallocFloat(array.remaining() * 2), array);}
+	public static IntBuffer malloc(MemoryStack stack, AIFace.Buffer array) {return arrayToBuffer(stack.mallocInt(array.remaining() * 3), array);}
+	
+	public static FloatBuffer malloc2D(MemoryStack stack, AIVector3D.Buffer array) {return arrayToBuffer2D(stack.mallocFloat(array.remaining() * 3), array);}
+	
 	public static void loadMesh(Mesh mesh) {
 		AIScene scene = Assimp.aiImportFile(mesh.filename, Assimp.aiProcess_Triangulate | Assimp.aiProcess_FlipUVs);
 		
@@ -41,22 +57,38 @@ public abstract class AssimpUtil {
 		
 		AIMesh aimesh = AIMesh.create(scene.mMeshes().get());
 		
-		FloatBuffer[] vertices = new FloatBuffer[3];
-		
-		vertices[0] = AssimpUtil.arrayToBuffer(aimesh.mVertices());
-		vertices[1] = AssimpUtil.arrayToBuffer(aimesh.mNormals());
-		vertices[2] = AssimpUtil.arrayToBuffer2D(aimesh.mTextureCoords(0));
-		
-		IntBuffer indices = AssimpUtil.arrayToBuffer(aimesh.mFaces());
-		
-		mesh.buffers = GLVertexArray.genBuffers(4);
-		mesh.vao = GLVertexArray.setUpVertexArray(mesh.buffers, vertices, indices, 3,3,2);
-		mesh.indices = indices.capacity();
-		
-//		buffers[0] = AssimpUtil.arrayToBuffer(mesh.mVertices());
-//		buffers[1] = AssimpUtil.arrayToBuffer(mesh.mNormals());
-//		buffers[2] = AssimpUtil.arrayToBuffer(mesh.mTangents());
-//		buffers[3] = AssimpUtil.arrayToBuffer(mesh.mBitangents());
-//		for(int i = 2; i < buffers.length; i++) buffers[i] = AssimpUtil.arrayToBuffer(mesh.mTextureCoords(i - 2));
+		try(MemoryStack stack = stackPush()){
+			int[] buffers = mesh.buffers = new int[4];
+			GL15.glGenBuffers(buffers);
+			
+			mesh.vao = GL30.glGenVertexArrays();
+			
+			GL30.glBindVertexArray(mesh.vao);
+			
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffers[0]);
+			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, malloc(stack, aimesh.mVertices()), GL15.GL_STATIC_DRAW);
+			
+			GL20.glEnableVertexAttribArray(0);
+			GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 3 * 4, 0);
+			
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffers[1]);
+			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, malloc(stack, aimesh.mNormals()), GL15.GL_STATIC_DRAW);
+			
+			GL20.glEnableVertexAttribArray(1);
+			GL20.glVertexAttribPointer(1, 3, GL11.GL_FLOAT, false, 3 * 4, 0);
+			
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffers[2]);
+			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, malloc2D(stack, aimesh.mTextureCoords(0)), GL15.GL_STATIC_DRAW);
+			
+			GL20.glEnableVertexAttribArray(2);
+			GL20.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, false, 2 * 4, 0);
+			
+			GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, buffers[3]);
+			GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, malloc(stack, aimesh.mFaces()), GL15.GL_STATIC_DRAW);
+			
+			mesh.indices = aimesh.mNumFaces() * 3;
+			
+			GL30.glBindVertexArray(0);
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.base.engine.data;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Resources {
@@ -46,5 +47,10 @@ public class Resources {
 		} else texture = textures.get(filename);
 		texture.increment(); 
 		return texture;
+	}
+	
+	public static void dispose() {
+		Collection<Mesh> meshcol = meshes.values();
+		for(Mesh m : meshcol) m.unload();
 	}
 }

@@ -1,5 +1,7 @@
 package com.base.engine.rendering.opengl;
 
+import static org.lwjgl.system.MemoryStack.stackPush;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -7,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryStack;
 
 import com.base.engine.core.util.Util;
 
@@ -110,16 +113,7 @@ public abstract class GLVertexArray {
 		return array;
 	}
 	
-	public static int setUpBuffer(int buffer, float[] data){arrayAlloc(data); return setUpBuffer(buffer, floatBuffer, GL15.GL_STATIC_DRAW);}
-	public static int setUpBuffer(int buffer, float[] data, int usage){arrayAlloc(data); return setUpBuffer(buffer, floatBuffer, usage);}
-	public static int setUpBuffer(int buffer, int usage){return setUpBuffer(buffer, floatBuffer, usage);}
-	public static int setUpBuffer(int buffer){return setUpBuffer(buffer, floatBuffer, GL15.GL_STATIC_DRAW);}
-	public static int setUpBuffer(int buffer, FloatBuffer data){return setUpBuffer(buffer, data, GL15.GL_STATIC_DRAW);}
-	public static int setUpBuffer(int buffer, FloatBuffer data, int usage){
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, usage);
-		return buffer;
-	}
+	
 	
 	public static void setUpVertexAttrib(int[] attribute_sizes, boolean interweaved){
 		if(interweaved){
@@ -133,11 +127,53 @@ public abstract class GLVertexArray {
 		}
 	}
 	
+	
+	public static int setUpBuffer(int buffer, float[] data) {return setUpBuffer(buffer, data, GL15.GL_STATIC_DRAW);}
+	public static int setUpBuffer(int buffer, float[] data, int usage){
+		try(MemoryStack stack = stackPush()) {return setUpBuffer(buffer, Util.malloc(data, stack), usage);}
+	}
+	public static int setUpBuffer(int buffer, int usage){return setUpBuffer(buffer, floatBuffer, usage);}
+	public static int setUpBuffer(int buffer){return setUpBuffer(buffer, floatBuffer, GL15.GL_STATIC_DRAW);}
+	public static int setUpBuffer(int buffer, FloatBuffer data){return setUpBuffer(buffer, data, GL15.GL_STATIC_DRAW);}
+	public static int setUpBuffer(int buffer, FloatBuffer data, int usage){
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, usage);
+		return buffer;
+	}
+	
+	
 	public static void setUpVertexAttrib(int index, int attribute_size){setUpVertexAttrib(index, attribute_size, 0);}
 	public static void setUpVertexAttrib(int index, int attribute_size, int stride){
 		GL20.glEnableVertexAttribArray(index);
 		GL20.glVertexAttribPointer(index, attribute_size, GL11.GL_FLOAT, false, attribute_size * 4, stride);
 	}
+	
+	
+	
+	public static void bindArrayBuffer(int buffer){GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);}
+	public static void bindVertexArray(int vertexArray){GL30.glBindVertexArray(vertexArray);}
+	public static void unbindVertexArray(){GL30.glBindVertexArray(0);}
+	
+//	public static int setUpElementBuffer(int... indices){arrayAlloc(indices); return setUpElementBuffer(GL15.glGenBuffers(), intBuffer);}
+//	public static int setUpElementBuffer(int buffer, int... indices){arrayAlloc(indices); return setUpElementBuffer(buffer, intBuffer);}
+//	public static int setUpElementBuffer(int buffer, IntBuffer indices){
+//		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer);
+//		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indices, GL15.GL_STATIC_DRAW);
+//		return buffer;
+//	}
+	
+	public static int setUpElementBuffer(int[] indices) {return setUpElementBuffer(GL15.glGenBuffers(), GL15.GL_STATIC_DRAW, indices);}
+	public static int setUpElementBuffer(int buffer, int[] indices) {return setUpElementBuffer(buffer, GL15.GL_STATIC_DRAW, indices);}
+	public static int setUpElementBuffer(int buffer, int buffer_type, int[] indices){
+		try(MemoryStack stack = stackPush()) {return setUpElementBuffer(buffer, buffer_type, Util.malloc(indices, stack));}
+	}
+	public static int setUpElementBuffer(int buffer, IntBuffer indices){return setUpElementBuffer(buffer, GL15.GL_STATIC_DRAW, indices);}
+	public static int setUpElementBuffer(int buffer, int buffer_type, IntBuffer indices) {
+		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer);
+		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indices, buffer_type);
+		return buffer;
+	}
+	
 	
 	public static void setUpVertexAttribMat4(int index){setUpVertexAttribMat4(index, 0);}
 	public static void setUpVertexAttribMat4(int index, int stride){
@@ -151,17 +187,6 @@ public abstract class GLVertexArray {
 		GL20.glVertexAttribPointer(index + 3, 4, GL11.GL_FLOAT, false, 64, stride + 48);
 	}
 	
-	public static void bindArrayBuffer(int buffer){GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);}
-	public static void bindVertexArray(int vertexArray){GL30.glBindVertexArray(vertexArray);}
-	public static void unbindVertexArray(){GL30.glBindVertexArray(0);}
-	
-	public static int setUpElementBuffer(int... indices){arrayAlloc(indices); return setUpElementBuffer(GL15.glGenBuffers(), intBuffer);}
-	public static int setUpElementBuffer(int buffer, int... indices){arrayAlloc(indices); return setUpElementBuffer(buffer, intBuffer);}
-	public static int setUpElementBuffer(int buffer, IntBuffer indices){
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer);
-		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indices, GL15.GL_STATIC_DRAW);
-		return buffer;
-	}
 	
 	public static int datatypeSize(int datatype){
 		switch(datatype){

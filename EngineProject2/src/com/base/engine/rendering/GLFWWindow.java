@@ -11,6 +11,7 @@ public class GLFWWindow extends Window{
 	GLContext context;
 	private long glfw_handle;
 	private int samples = 1;
+	private Runnable sizeCallback;
 	
 	public long getGLFWHandle(){return glfw_handle;}
 	
@@ -42,7 +43,7 @@ public class GLFWWindow extends Window{
 		glfwShowWindow(glfw_handle);
 	}
 	
-	public void setSizeCallback(GLContext context){this.context = context;}
+	public void setSizeCallback(Runnable run){this.sizeCallback = run;}
 	public void setCursorPos(float x, float y){glfwSetCursorPos(this.glfw_handle, x, y);}
 	public void setCursorMiddle() {
 		glfwSetCursorPos(this.glfw_handle, this.width/2, this.height/2);
@@ -50,7 +51,7 @@ public class GLFWWindow extends Window{
 	public void lockCursor(){glfwSetInputMode(glfw_handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);}
 	public void unlockCursor(){glfwSetInputMode(glfw_handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);}
 	
-	private void updateContext(){if(context != null) context.viewport(this);}
+	private void updateContext(){if(sizeCallback != null) sizeCallback.run();}
 	
 	public void swapBuffers(){glfwSwapBuffers(this.glfw_handle);}
 	public static void pollEvents(){glfwPollEvents();}

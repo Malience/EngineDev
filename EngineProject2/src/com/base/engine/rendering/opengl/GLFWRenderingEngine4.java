@@ -44,7 +44,7 @@ public class GLFWRenderingEngine4 {
 		window = CoreEngine.window;
 		context = new GLContext(33);
 		context.viewport(window);
-		window.setSizeCallback(context);
+		//window.setSizeCallback(context);
 		
 		glClearColor(0f, 0f, 0f, 1f);
 

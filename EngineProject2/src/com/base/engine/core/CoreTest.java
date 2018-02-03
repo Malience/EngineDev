@@ -2,6 +2,8 @@ package com.base.engine.core;
 
 import java.util.Stack;
 
+import org.lwjgl.system.Configuration;
+
 import com.base.engine.input.GLFWInputEngine;
 import com.base.engine.input.InputMapping;
 import com.base.engine.input.InputMapping.ActionPair;
@@ -12,6 +14,7 @@ import com.base.engine.rendering.opengl.GLFWRenderingEngine2;
 
 public class CoreTest {
 	public static void main(String [] args) {
+		Configuration.STACK_SIZE.set(25000);
 		CoreEngine engine = new CoreEngine(new Engine[] {new GLFWInputEngine(), new PhysicsEngine(), new GLFWRenderingEngine2()});
 		
 		Stack<ActionPair> actions = InputMapping.actions = new Stack<ActionPair>();

@@ -64,7 +64,7 @@ public class GLFWRenderingEngine2 implements Engine {
 		window = CoreEngine.window;
 		context = new GLContext(33);
 		context.viewport(window);
-		window.setSizeCallback(context);
+		window.setSizeCallback(this::resize);
 		
 		glClearColor(0f, 1f, 1f, 1f);
 
@@ -290,6 +290,13 @@ public class GLFWRenderingEngine2 implements Engine {
 	    
 		GLVertexArray.unbindVertexArray();
 		window.swapBuffers();
+	}
+	
+	public void resize() {
+		proj.perspective(fov, (float) window.getWidth() / (float) window.getHeight(), .1f, 1000f);
+		drenderer = new DeferredRenderer(window.getWidth(), window.getHeight(), true, proj);
+		GLShader.bindProgram(watershader);
+		GLShader.setUniformMat4(GL20.glGetUniformLocation(watershader, "projection"), proj);
 	}
 	
 	public void dispose() {

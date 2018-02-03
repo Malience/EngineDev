@@ -3,6 +3,8 @@ package com.base.engine.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+
+import com.base.engine.data.Resources;
 import com.base.engine.rendering.GLFWWindow;
 
 public class CoreEngine implements Engine {
@@ -77,5 +79,6 @@ public class CoreEngine implements Engine {
 	public void dispose() {
 		for(int i = 0; i < engines.length; i++) engines[i].dispose();
 		window.dispose();
+		Resources.dispose();
 	}
 }
