@@ -10,12 +10,12 @@ import com.base.engine.input.InputMapping.ActionPair;
 import com.base.engine.input.InputMapping.RangePair;
 import com.base.engine.physics.PhysicsEngine;
 import com.base.engine.rendering.Camera;
-import com.base.engine.rendering.opengl.GLFWRenderingEngine2;
+import com.base.engine.rendering.opengl.RenderingEngine;
 
 public class CoreTest {
 	public static void main(String [] args) {
 		Configuration.STACK_SIZE.set(25000);
-		CoreEngine engine = new CoreEngine(new Engine[] {new GLFWInputEngine(), new PhysicsEngine(), new GLFWRenderingEngine2()});
+		CoreEngine engine = new CoreEngine(new Engine[] {new GLFWInputEngine(), new PhysicsEngine(), new RenderingEngine()});
 		
 		Stack<ActionPair> actions = InputMapping.actions = new Stack<ActionPair>();
 		

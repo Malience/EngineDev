@@ -12,7 +12,6 @@ public class Resources {
 	public static final String MESH_PATH = "./res/meshes/";
 	public static Mesh loadMesh(String filename) {
 		filename = MESH_PATH + filename;
-		System.out.println(new File(filename).getAbsolutePath());
 		Mesh mesh;
 		if(!meshes.containsKey(filename)) {
 			mesh = new Mesh(filename);
@@ -24,7 +23,7 @@ public class Resources {
 	}
 	
 	public static final String SHADER_PATH = "./res/shaders/";
-	public static int loadShader(String filename) {
+	public static Shader loadShader(String filename) {
 		filename = SHADER_PATH + filename;
 		Shader shader;
 		if(!shaders.containsKey(filename)) {
@@ -33,10 +32,10 @@ public class Resources {
 			shader.load();
 		} else shader = shaders.get(filename);
 		shader.increment(); 
-		return shader.program;
+		return shader;
 	}
 	
-	public static final String TEXTURE_PATH = "";//./res/textures/";
+	public static final String TEXTURE_PATH = "./res/textures/";
 	public static Texture loadTexture(String filename) {
 		filename = TEXTURE_PATH + filename;
 		Texture texture;

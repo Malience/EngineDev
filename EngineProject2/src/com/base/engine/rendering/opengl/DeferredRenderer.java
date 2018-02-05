@@ -37,6 +37,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import com.base.engine.data.Resources;
+import com.base.engine.data.Shader;
 import com.base.engine.rendering.DirectionalLight;
 import com.base.engine.rendering.Material;
 import com.base.engine.rendering.MaterialMap;
@@ -48,141 +49,69 @@ import math.Vector3f;
 public class DeferredRenderer {
 	
 	
-	//Shaders
-	public static final int GBUFFER_SHADER = Resources.loadShader("gbuffer.glsl"), SSAO_SHADER = Resources.loadShader("ssao.glsl"), BLUR_SHADER = Resources.loadShader("ssaoblur.glsl");
-	private static final int GBUFFER_COLOR_SHADER = Resources.loadShader("gbuffercolor.glsl"), LIGHTING_SHADER = Resources.loadShader("gbufferlight2.glsl");
-	public static final int TERRAIN_SHADER = Resources.loadShader("terrain.glsl");
-	private static final int TERRAIN_VIEW_UNIFORM = GL20.glGetUniformLocation(TERRAIN_SHADER, "view"), TERRAIN_MODEL_UNIFORM = GL20.glGetUniformLocation(TERRAIN_SHADER, "model");
-			
-	private static final int GBUFFER_VIEW_UNIFORM = GL20.glGetUniformLocation(GBUFFER_SHADER, "view"), GBUFFER_PROJ_UNIFORM = GL20.glGetUniformLocation(GBUFFER_SHADER, "projection");
-	private static final int GBUFFER_MODEL_UNIFORM = GL20.glGetUniformLocation(GBUFFER_SHADER, "model");
-	private static final int LIGHTING_VIEW_UNIFORM = GL20.glGetUniformLocation(LIGHTING_SHADER, "view"), LIGHTING_PROJ_UNIFORM = GL20.glGetUniformLocation(LIGHTING_SHADER, "projection");
+	
 	int width, height;
 	//MSAA stuff TODO
 	
-	public DeferredRenderer(int width, int height, boolean ssao, Matrix4f proj){
-		this.width = width; this.height = height; this.ssao = ssao;
-		GLShader.bindProgram(GBUFFER_SHADER);
-		GLShader.setUniformMat4(GBUFFER_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(LIGHTING_SHADER);
-		GLShader.setUniformMat4(LIGHTING_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(TERRAIN_SHADER);
-		GLShader.setUniformMat4(TERRAIN_SHADER, "projection", proj);
-		GLShader.bindProgram(SSAO_SHADER);
-		GLShader.setUniformMat4(SSAO_SHADER, "projection", proj);
-		initGBuffer();
-		if(ssao)initSSAO();
-		initLighting();
-	}
+	//Shaders
+	public Shader gbuffer_shader, terrain_shader, lighting_shader, ssao_shader, blur_shader;
+	//private int ssao_uniform, shadows_uniforms, shadows_samples_uniform;
 	
-	public DeferredRenderer(int width, int height, boolean ssao, FloatBuffer proj){
-		this.width = width; this.height = height; this.ssao = ssao;
-		GLShader.bindProgram(GBUFFER_SHADER);
-		GLShader.setUniformMat4(GBUFFER_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(LIGHTING_SHADER);
-		GLShader.setUniformMat4(LIGHTING_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(TERRAIN_SHADER);
-		GLShader.setUniformMat4(TERRAIN_SHADER, "projection", proj);
-		GLShader.bindProgram(SSAO_SHADER);
-		GLShader.setUniformMat4(SSAO_SHADER, "projection", proj);
-		initGBuffer();
-		if(ssao)initSSAO();
-		initLighting();
+	public void initShaders(String gbuffer, String terrain, String lighting, String ssao, String blur) {
+		gbuffer_shader = Resources.loadShader(gbuffer);
+		terrain_shader = Resources.loadShader(terrain);
+		lighting_shader = Resources.loadShader(lighting);
+		ssao_shader = Resources.loadShader(ssao);
+		blur_shader = Resources.loadShader(blur);
+		
+		gbuffer_shader.setUniformLocations("projection", "view", "model");
+		terrain_shader.setUniformLocations("projection", "view", "model");
+		lighting_shader.setUniformLocations("projection", "view", "model");
+		ssao_shader.setUniformLocations("projection", "view", "model");
+		
+		
+		int lighting_program = lighting_shader.program;
+		GLShader.bindProgram(lighting_program);
+	    GLShader.setUniform(lighting_program, "gPosition", 0);
+	    GLShader.setUniform(lighting_program, "gNormal", 1);
+	    GLShader.setUniform(lighting_program, "gAlbedoSpec", 2);
+        GLShader.setUniform(lighting_program, "ssao", 3);
+        GLShader.setUniform(lighting_program, "shadowMap", 4);
+        GLShader.setUniform(lighting_program, "shadowSamples", 1);
+        GLShader.setUniform(lighting_program, "ssaoEnabled", 0);
+		GLShader.setUniform(lighting_program, "shadowsEnabled", 0);
+		
+		int ssao_program = ssao_shader.program;
+		GLShader.bindProgram(ssao_program);
+		GLShader.setUniform(ssao_program, "gPosition", 0);
+	    GLShader.setUniform(ssao_program, "gNormal", 1);
+	    GLShader.setUniform(ssao_program, "texNoise", 2);
+	    
+	    int blur_program = blur_shader.program;
+	    GLShader.bindProgram(blur_program);
+        GLShader.setUniform(blur_program, "ssaoInput", 0);
 	}
 	
 	public void setProjection(Matrix4f proj) {
-		GLShader.bindProgram(GBUFFER_SHADER);
-		GLShader.setUniformMat4(GBUFFER_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(LIGHTING_SHADER);
-		GLShader.setUniformMat4(LIGHTING_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(TERRAIN_SHADER);
-		GLShader.setUniformMat4(TERRAIN_SHADER, "projection", proj);
-		GLShader.bindProgram(SSAO_SHADER);
-		GLShader.setUniformMat4(SSAO_SHADER, "projection", proj);
-		GLShader.bindProgram(GBUFFER_SHADER);
+		GLShader.bindProgram(gbuffer_shader.program);
+		GLShader.setUniformMat4(gbuffer_shader.proj, proj);
+		GLShader.bindProgram(lighting_shader.program);
+		GLShader.setUniformMat4(lighting_shader.proj, proj);
+		GLShader.bindProgram(terrain_shader.program);
+		GLShader.setUniformMat4(terrain_shader.proj, proj);
+		GLShader.bindProgram(ssao_shader.program);
+		GLShader.setUniformMat4(ssao_shader.proj, proj);
 	}
 	
-	public void setProjection(FloatBuffer proj) {
-		GLShader.bindProgram(GBUFFER_SHADER);
-		GLShader.setUniformMat4(GBUFFER_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(LIGHTING_SHADER);
-		GLShader.setUniformMat4(LIGHTING_PROJ_UNIFORM, proj);
-		GLShader.bindProgram(TERRAIN_SHADER);
-		GLShader.setUniformMat4(TERRAIN_SHADER, "projection", proj);
-		GLShader.bindProgram(SSAO_SHADER);
-		GLShader.setUniformMat4(SSAO_SHADER, "projection", proj);
-		GLShader.bindProgram(GBUFFER_SHADER);
+	
+	public DeferredRenderer(int width, int height){
+		this.width = width; this.height = height;;
 	}
 	
-	public void prepare(Matrix4f view){
-		glEnable(GL_CULL_FACE);
-	    glCullFace(GL_BACK);
-	    glEnable(GL11.GL_DEPTH_TEST);
-		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, gbuffer);
-	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	    GLShader.bindProgram(TERRAIN_SHADER);
-		GLShader.setUniformMat4(TERRAIN_VIEW_UNIFORM, view);
-	    GLShader.bindProgram(GBUFFER_SHADER);
-	    GLShader.setUniformMat4(GBUFFER_VIEW_UNIFORM, view);
-	}
-	
-	public void render(int mesh, int indices, MaterialMap mat, Transform transform){
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.diffuse);
-		GL13.glActiveTexture(GL13.GL_TEXTURE1);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.specular >= 0 ? mat.specular : mat.diffuse);
-		GLShader.setUniformMat4(GBUFFER_MODEL_UNIFORM, transform.getTransformation());
-		GLRendering.renderMesh(mesh, indices);
-	}
-	
-	public void render(int[] meshes, MaterialMap[] mats, Transform[] transforms){
-		for(int i = 0; i < mats.length; i++){
-			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, mats[i].diffuse);
-			GL13.glActiveTexture(GL13.GL_TEXTURE1);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, mats[i].specular >= 0 ? mats[i].specular : mats[i].diffuse);
-			GLShader.setUniformMat4(GBUFFER_MODEL_UNIFORM, transforms[i].getTransformation());
-			GLRendering.renderMesh(meshes[i * 2], meshes[i * 2 + 1]);
-		}
-	}
-	
-	public void render(int mesh, int indices, MaterialMap mat, Transform[] transforms){
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.diffuse);
-		GL13.glActiveTexture(GL13.GL_TEXTURE1);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.specular >= 0 ? mat.specular : mat.diffuse);
-		for(int i = 0; i < transforms.length; i++){
-			GLShader.setUniformMat4(GBUFFER_MODEL_UNIFORM, transforms[i].getTransformation());
-			GLRendering.renderMesh(mesh, indices);
-		}
-	}
-	
-	public void render(int mesh, int indices, int end, MaterialMap mat, Transform[] transforms){
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.diffuse);
-		GL13.glActiveTexture(GL13.GL_TEXTURE1);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.specular >= 0 ? mat.specular : mat.diffuse);
-		for(int i = 0; i < end; i++){
-			GLShader.setUniformMat4(GBUFFER_MODEL_UNIFORM, transforms[i].getTransformation());
-			GLRendering.renderMesh(mesh, indices);
-		}
-	}
-	
-	public void render(Terrain mesh){
-		GLShader.bindProgram(TERRAIN_SHADER);
-	    GLShader.setUniformMat4(TERRAIN_MODEL_UNIFORM, mesh.transform.getTransformation());
-	    GL13.glActiveTexture(GL13.GL_TEXTURE0);
-	    glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
-	    GL13.glActiveTexture(GL13.GL_TEXTURE1);
-	    glBindTexture(GL_TEXTURE_2D, mesh.textures[1]);
-	    GL13.glActiveTexture(GL13.GL_TEXTURE2);
-	    glBindTexture(GL_TEXTURE_2D, mesh.textures[2]);
-	    GL13.glActiveTexture(GL13.GL_TEXTURE3);
-	    glBindTexture(GL_TEXTURE_2D, mesh.textures[3]);
-	    GL13.glActiveTexture(GL13.GL_TEXTURE4);
-	    glBindTexture(GL_TEXTURE_2D, mesh.textures[4]);
-	    GLRendering.renderMesh(mesh.mesh, mesh.getIndices());
-		GLShader.bindProgram(GBUFFER_SHADER);
+	public void init() {
+		initGBuffer();
+		if(ssao)initSSAO();
+		initLighting();
 	}
 	
 	public void renderLighting(Matrix4f view, Vector3f viewpos, DirectionalLight dlight, int buffer, int width, int height){
@@ -190,19 +119,19 @@ public class DeferredRenderer {
 			//SSAO
 			GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, ssaoframebuffer);
 		    glClear(GL_COLOR_BUFFER_BIT);
-		    GLShader.bindProgram(SSAO_SHADER);
+		    GLShader.bindProgram(ssao_shader.program);
 		    GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		    glBindTexture(GL_TEXTURE_2D, gposition);
 		    GL13.glActiveTexture(GL13.GL_TEXTURE1);
 		    glBindTexture(GL_TEXTURE_2D, gnormal);
 		    GL13.glActiveTexture(GL13.GL_TEXTURE2);
 		    glBindTexture(GL_TEXTURE_2D, noiseTexture);
-		    GLShader.setUniformMat4(SSAO_SHADER, "view", view);
+		    GLShader.setUniformMat4(ssao_shader.view, view);
 		    GLRendering.renderQuad();
 		    //SSAO BLUR
 	    	GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, ssaoblurframebuffer);
 	    	glClear(GL_COLOR_BUFFER_BIT);
-	    	GLShader.bindProgram(BLUR_SHADER);
+	    	GLShader.bindProgram(blur_shader.program);
 	    	GL13.glActiveTexture(GL13.GL_TEXTURE0);
 	        glBindTexture(GL_TEXTURE_2D, ssaobuffer);
 	    	GLRendering.renderQuad();
@@ -211,24 +140,27 @@ public class DeferredRenderer {
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, buffer);
 		GL11.glViewport(0, 0, width, height);
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	    GLShader.bindProgram(LIGHTING_SHADER);
-	    GLShader.setUniformMat4(LIGHTING_SHADER, "view", view);
-	    GLShader.setUniformVec3(LIGHTING_SHADER, "viewPos", viewpos);
-	    GLShader.setLight(LIGHTING_SHADER, dlight);
+	    GLShader.bindProgram(lighting_shader.program);
+	    GLShader.setUniformMat4(lighting_shader.view, view);
+	    GLShader.setUniformVec3(lighting_shader.program, "viewPos", viewpos);
+	    GLShader.setLight(lighting_shader.program, dlight);
 	    GL13.glActiveTexture(GL13.GL_TEXTURE0);
 	    glBindTexture(GL_TEXTURE_2D, gposition);
 	    GL13.glActiveTexture(GL13.GL_TEXTURE1);
 	    glBindTexture(GL_TEXTURE_2D, gnormal);
 	    GL13.glActiveTexture(GL13.GL_TEXTURE2);
 	    glBindTexture(GL_TEXTURE_2D, galbedospec);
-	    if(ssao){GL13.glActiveTexture(GL13.GL_TEXTURE3);
-	    glBindTexture(GL_TEXTURE_2D, ssaoblurbuffer);}
+	    GL13.glActiveTexture(GL13.GL_TEXTURE3);
+	    glBindTexture(GL_TEXTURE_2D, ssaoblurbuffer);
 		GLRendering.renderQuad();
 	}
 	
 	//GBuffer
-	public int gbuffershader, gbuffer, gposition, gnormal, galbedospec, gdepth;
-	public void initGBuffer(){
+	public int gbuffer;
+	private int gposition, gnormal, galbedospec;
+
+	int gdepth;
+	private void initGBuffer(){
 		gbuffer = GLFramebuffer.genFramebuffers();
 		
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, gbuffer);
@@ -254,15 +186,13 @@ public class DeferredRenderer {
 		GLFramebuffer.setUpDepthStencilBuffer(gbuffer, gdepth, width, height);
 		
 		if(GLFramebuffer.checkFramebufferStatus(gbuffer)) System.err.println("GBuffer not complete!");
-		
-		
 	}
 	
 	//SSAO
-	boolean ssao;
-	int ssaoframebuffer, ssaobuffer, noiseTexture, ssaoblurframebuffer, ssaoblurbuffer;
-	public void initSSAO(){initSSAO(8, 4);}
-	public void initSSAO(int kernel_size, int noise_size){
+	boolean ssao = false;
+	private int ssaoframebuffer, ssaobuffer, noiseTexture, ssaoblurframebuffer, ssaoblurbuffer;
+	private void initSSAO(){initSSAO(8, 4);}
+	private void initSSAO(int kernel_size, int noise_size){
 		initSSAOKernel(kernel_size);
 		initSSAONoise(noise_size);
 		
@@ -272,22 +202,15 @@ public class DeferredRenderer {
 		ssaobuffer = GLTexture.createRedBuffer(width, height);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaobuffer, 0);
 		
-	    GLShader.setUniform(SSAO_SHADER, "gPosition", 0);
-	    GLShader.setUniform(SSAO_SHADER, "gNormal", 1);
-	    GLShader.setUniform(SSAO_SHADER, "texNoise", 2);
+	    
 	    
     	ssaoblurframebuffer = GLFramebuffer.genFramebuffers();
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, ssaoblurframebuffer);
 		ssaoblurbuffer = GLTexture.createRedBuffer(width, height);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoblurbuffer, 0);
-        GLShader.bindProgram(BLUR_SHADER);
-        GLShader.setUniform(BLUR_SHADER, "ssaoInput", 0);
-        
-        
 	}
 	
-	private static final int KERNEL_SIZE_UNIFORM = GL20.glGetUniformLocation(SSAO_SHADER, "kernelSize");
-	public void initSSAOKernel(int kernel_size){
+	private void initSSAOKernel(int kernel_size){
 		kernel_size *= kernel_size;
 		
 		Vector3f[] ssaokernel = new Vector3f[kernel_size];
@@ -301,30 +224,33 @@ public class DeferredRenderer {
 					((float)Math.random())
 					).normalize().mul(((float)Math.random()) * scale);
 		}
-		
-		GLShader.setUniform(KERNEL_SIZE_UNIFORM, kernel_size);
-	    GLShader.setUniformVec3(SSAO_SHADER, "samples", ssaokernel);
+		GLShader.bindProgram(ssao_shader.program);
+		GLShader.setUniform(ssao_shader.program, "kernelSize", kernel_size);
+	    GLShader.setUniformVec3(ssao_shader.program, "samples", ssaokernel);
 	}
 	
-	public void initSSAONoise(int noise_size){noiseTexture = GLTexture.createNoiseTexture(noise_size, noise_size);}
+	private void initSSAONoise(int noise_size){noiseTexture = GLTexture.createNoiseTexture(noise_size, noise_size);}
+	
+	public void dispose() {
+		GLFramebuffer.deleteFramebuffers(gbuffer);
+		GLFramebuffer.deleteFramebuffers(ssaoframebuffer);
+		GLFramebuffer.deleteFramebuffers(ssaoblurframebuffer);
+		
+		GLTexture.deleteTexture(gposition);
+		GLTexture.deleteTexture(gnormal);
+		GLTexture.deleteTexture(galbedospec);
+		GLTexture.deleteTexture(gdepth);
+		GLTexture.deleteTexture(ssaobuffer);
+		GLTexture.deleteTexture(noiseTexture);
+		GLTexture.deleteTexture(ssaoblurbuffer);
+	}
+	
 	
 	//Lighting
-	boolean shadows = true;
+	boolean shadows = false;
 	private void initLighting(){
-		GLShader.bindProgram(LIGHTING_SHADER);
-	    GLShader.setUniform(LIGHTING_SHADER, "gPosition", 0);
-	    GLShader.setUniform(LIGHTING_SHADER, "gNormal", 1);
-	    GLShader.setUniform(LIGHTING_SHADER, "gAlbedoSpec", 2);
-        GLShader.setUniform(LIGHTING_SHADER, "ssao", 3);
-        GLShader.setUniform(LIGHTING_SHADER, "shadowMap", 4);
-        GLShader.setUniform(SHADOWS_SAMPLES_UNIFORM, 1);
-        GLShader.setUniform(SSAO_UNIFORM, ssao);
-		GLShader.setUniform(SHADOWS_UNIFORM, shadows);
+		
 	}
-	private static final int SSAO_UNIFORM = GL20.glGetUniformLocation(LIGHTING_SHADER, "ssaoEnabled");
-	private static final int SHADOWS_UNIFORM = GL20.glGetUniformLocation(LIGHTING_SHADER, "shadowsEnabled");
-	private static final int SHADOWS_SAMPLES_UNIFORM = GL20.glGetUniformLocation(LIGHTING_SHADER, "shadowsEnabled");
-	
-	public void toggleSSAO(){ssao = !ssao; GLShader.setUniform(SSAO_UNIFORM, ssao);}
-	public void toggleShadows(){shadows = !shadows; GLShader.setUniform(SHADOWS_UNIFORM, shadows);}
+//	public void toggleSSAO(){ssao = !ssao; GLShader.setUniform(SSAO_UNIFORM, ssao);}
+//	public void toggleShadows(){shadows = !shadows; GLShader.setUniform(SHADOWS_UNIFORM, shadows);}
 }

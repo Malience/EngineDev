@@ -31,7 +31,7 @@ public class InputContext {
 				else{
 					action = InputMapping.getRangeIndex(bindings[i+1]);
 					if(action >= 0) rangeBindings.put(binding, action);
-					else System.out.println("Action doesn't exist!");
+					//else System.out.println("Action doesn't exist!");
 				}
 			}
 		}

@@ -260,7 +260,7 @@ public abstract class GLTexture {
 	private static ByteBuffer loadTextureFile(String filename, int[] sizes, boolean[] alpha) {
 		try {
 			BufferedImage image = null;
-			File file = new File("./res/textures/" + filename);
+			File file = new File(filename);
 			if(file.exists()) image = ImageIO.read(file);
 			else {
 				System.out.println("All hope has failed");

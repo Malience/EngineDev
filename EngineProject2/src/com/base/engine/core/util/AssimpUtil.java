@@ -5,7 +5,6 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -14,8 +13,6 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryStack;
 
 import com.base.engine.data.Mesh;
-import com.base.engine.rendering.opengl.GLVertexArray;
-import com.sun.deploy.util.BufferUtil;
 
 public abstract class AssimpUtil {
 	public static FloatBuffer arrayToBuffer(AIVector3D.Buffer array){return arrayToBuffer(Util.createFloatBuffer(array.remaining()*3), array);}
