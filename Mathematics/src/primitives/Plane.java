@@ -14,8 +14,9 @@ public class Plane extends Primitive {
 		float v02x = v0x - v2x, v02y = v0y - v2y, v02z = v0z - v2z;
 		float a = v01y * v02z - v01z * v02y, b = v01z * v02x - v01x * v02z, c = v01x * v02y - v01y * v02x;
 		float length = 1f/(float)Math.sqrt(a * a + b * b + c * c);
+		a *= length; b *= length; c *= length;
+		normal = new Vector3f(a, b, c);
 		d = -a * v0x - b * v0y - c * v0z;
-		normal = new Vector3f(a * length, b * length, c * length);
 	}
 	
 	public Plane(Vector3f normal, float offset){
@@ -28,4 +29,5 @@ public class Plane extends Primitive {
 	
 	public void normalize() {normal.normalize();}
 	
+	public String toString() {return "Normal: " + normal + " Dist: " + d;}
 }

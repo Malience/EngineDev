@@ -621,6 +621,17 @@ public class Matrix4f {
 	
 	//~~~~~~~~~~~MISC~~~~~~~~~~~\\
 	
+	public Vector4f transform(Vector4f v) {return transform(this, v, v);}
+	public Vector4f transform(Vector4f v, Vector4f out) {return transform(this, v, out);}
+	
+	public static Vector4f transform(Matrix4f m, Vector4f v, Vector4f out) {
+		float nx = m.m00 * v.x + m.m01 * v.y + m.m02 * v.z + m.m03 * v.w;
+		float ny = m.m10 * v.x + m.m11 * v.y + m.m12 * v.z + m.m13 * v.w;
+		float nz = m.m20 * v.x + m.m21 * v.y + m.m22 * v.z + m.m23 * v.w;
+		float nw = m.m30 * v.x + m.m31 * v.y + m.m32 * v.z + m.m33 * v.w;
+		return out.set(nx, ny, nz, nw);
+	}
+	
 	public String toString() {
 		return 	m00 + ", " + m01 + ", " + m02 + ", " + m03 + "\n" +
 				m10 + ", " + m11 + ", " + m12 + ", " + m13 + "\n" +
