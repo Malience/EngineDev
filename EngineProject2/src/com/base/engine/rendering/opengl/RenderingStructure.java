@@ -3,13 +3,13 @@ package com.base.engine.rendering.opengl;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
-import java.nio.FloatBuffer;
 import java.util.HashMap;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
+import com.base.engine.data.Material;
 import com.base.engine.data.Mesh;
 import com.base.engine.data.Shader;
 import com.base.math.Transform;
@@ -18,7 +18,7 @@ import math.Matrix4f;
 
 public class RenderingStructure {
 	private HashMap<Material, Batch> matmap;
-	private Batch[] batchstack;
+	public Batch[] batchstack;
 	private int next, size;
 	public Terrain terrain;
 	
@@ -84,21 +84,21 @@ public class RenderingStructure {
 		next = 0;
 	}
 	
-	private static class Batch {
+	static class Batch {
 		int diffuse;
 		int[] meshes;
-		FloatBuffer[] buffers;
+		Transform[] transforms;
 		int next = 0;
 		
 		Batch(int size){
 			meshes = new int[size << 1];
-			buffers = new FloatBuffer[size];
+			transforms = new Transform[size];
 		}
 		
 		void setMaterial(Material mat) {this.diffuse = mat.diffuse.texture;}
 		
 		void addMesh(Mesh mesh, Transform transform) {
-			buffers[next] = transform.getBuffer();
+			transforms[next] = transform;
 			meshes[next << 1] = mesh.vao;
 			meshes[(next << 1) + 1] = mesh.indices;
 			next++;
@@ -110,13 +110,13 @@ public class RenderingStructure {
 			GL13.glActiveTexture(GL13.GL_TEXTURE1);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, diffuse);
 			for(int i = 0; i < next; i++) {
-				GLShader.setUniformMat4(model_loc, buffers[i]);
+				GLShader.setUniformMat4(model_loc, transforms[i].getBuffer());
 				GLRendering.renderMesh(meshes[i << 1], meshes[(i << 1) + 1]);
 			}
 		}
 		
 		void dispose() {
-			for(int i = 0; i < next; i++) buffers[i] = null;
+			for(int i = 0; i < next; i++) transforms[i] = null;
 			next = 0;
 		}
 		

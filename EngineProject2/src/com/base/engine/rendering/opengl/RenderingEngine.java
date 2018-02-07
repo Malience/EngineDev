@@ -1,42 +1,19 @@
 package com.base.engine.rendering.opengl;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
-import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT1;
-import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT2;
-import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
-import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
-
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL32;
-
 import com.base.engine.core.CoreEngine;
 import com.base.engine.core.Engine;
-import com.base.engine.core.GameObject;
 import com.base.engine.core.Time;
-import com.base.engine.core.util.Util;
+import com.base.engine.data.Material;
 import com.base.engine.data.Mesh;
 import com.base.engine.data.Resources;
-import com.base.engine.physics.Frustum;
-import com.base.engine.physics.Octree;
-import com.base.engine.physics.PhysicsEngine;
 import com.base.engine.rendering.Camera;
 import com.base.engine.rendering.DirectionalLight;
 import com.base.engine.rendering.GLFWWindow;
-import com.base.engine.rendering.MaterialMap;
-import com.base.engine.rendering.PointLight;
-import com.base.engine.rendering.Projection;
 import com.base.engine.data.Shader;
 import com.base.engine.data.Texture;
-import com.base.engine.rendering.SpotLight;
-import com.base.engine.rendering.TContainer;
 import com.base.engine.rendering.water.WaterTile;
 
 import math.MathUtil;
@@ -58,6 +35,7 @@ public class RenderingEngine implements Engine {
 	RenderingStructure structure;
 	Texture dudv;
 	
+	@Override
 	public void start() {
 		window = CoreEngine.window;
 		context = new GLContext(33);
@@ -98,7 +76,7 @@ public class RenderingEngine implements Engine {
 		Material bricks = new Material(Resources.loadTexture("bricks.png"));
 		
 		
-		Mesh dragon = Resources.loadMesh("dragon.obj");
+		//Mesh dragon = Resources.loadMesh("dragon.obj");
 		
 		Mesh box = Resources.loadMesh("Basic Cube.obj");
 		//box = Resources.loadMesh("capsule.obj");
@@ -131,6 +109,7 @@ public class RenderingEngine implements Engine {
 	Camera camera2 = new Camera();
 	Matrix4f proj;
 	static float fov = 45f, exposure = 1.0f;
+	@Override
 	public void run() {
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -193,6 +172,7 @@ public class RenderingEngine implements Engine {
 //		GLShader.setUniformMat4(GL20.glGetUniformLocation(watershader, "projection"), proj);
 	}
 	
+	@Override
 	public void dispose() {
 		gbuffer.dispose();
 		waterbuffer.dispose();

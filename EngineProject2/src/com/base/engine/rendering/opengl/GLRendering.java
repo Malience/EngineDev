@@ -9,15 +9,8 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import com.base.engine.rendering.Material;
-import com.base.engine.rendering.MaterialMap;
-
 public abstract class GLRendering {
 	public static void renderMesh(int mesh, int indices, int shader, int[] textures){if(textures != null)GLShader.bindTexture(shader, textures);renderMesh(mesh, indices);}
-	public static void renderMesh(int mesh, int indices, int shader, Material material)
-	{if(material != null) GLShader.setMaterial(shader, material);renderMesh(mesh, indices);}
-	public static void renderMesh(int mesh, int indices, int shader, MaterialMap material)
-	{if(material != null) GLShader.bindMaterial(shader, material);renderMesh(mesh, indices);}
 	public static void renderMesh(int mesh, int indices){GL30.glBindVertexArray(mesh);GL11.glDrawElements(GL11.GL_TRIANGLES, indices, GL11.GL_UNSIGNED_INT, 0);}
 	
 	static int quadVAO = 0;

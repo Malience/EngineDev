@@ -1,36 +1,15 @@
 package com.base.engine.rendering.opengl;
 
-import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT1;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT2;
 import static org.lwjgl.opengl.GL30.GL_FRAMEBUFFER;
-import static org.lwjgl.opengl.GL30.GL_RGBA16F;
 import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
-import static org.lwjgl.opengl.GL30.glGenRenderbuffers;
-
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-
-import org.lwjgl.*;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -39,17 +18,10 @@ import org.lwjgl.opengl.GL30;
 import com.base.engine.data.Resources;
 import com.base.engine.data.Shader;
 import com.base.engine.rendering.DirectionalLight;
-import com.base.engine.rendering.Material;
-import com.base.engine.rendering.MaterialMap;
-import com.base.engine.rendering.PointLight;
 import math.Matrix4f;
-import com.base.math.Transform;
 import math.Vector3f;
 
 public class DeferredRenderer {
-	
-	
-	
 	int width, height;
 	//MSAA stuff TODO
 	

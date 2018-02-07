@@ -1,6 +1,5 @@
 package com.base.engine.data;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -51,5 +50,9 @@ public class Resources {
 	public static void dispose() {
 		Collection<Mesh> meshcol = meshes.values();
 		for(Mesh m : meshcol) m.unload();
+		Collection<Shader> shadercol = shaders.values();
+		for(Shader s : shadercol) s.unload();
+		Collection<Texture> texcol = textures.values();
+		for(Texture t : texcol) t.unload();
 	}
 }

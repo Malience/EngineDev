@@ -1,6 +1,4 @@
-package com.base.engine.rendering.opengl;
-
-import com.base.engine.data.Texture;
+package com.base.engine.data;
 
 public class Material {
 	public Texture diffuse;

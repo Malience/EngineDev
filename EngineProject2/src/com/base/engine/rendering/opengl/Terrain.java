@@ -9,16 +9,14 @@ import java.nio.IntBuffer;
 import javax.imageio.ImageIO;
 
 import com.base.engine.core.util.Util;
-import com.base.engine.rendering.MaterialMap;
 import com.base.math.Transform;
-import math.Vector3f;
 
 import math.MathUtilOLD;
 
 public class Terrain {
-	private static final float SIZE = 80;
-	private static final float MAX_HEIGHT = 10f;
-	private static final float MIN_HEIGHT = -10f;
+	//private static final float SIZE = 80;
+	//private static final float MAX_HEIGHT = 10f;
+	//private static final float MIN_HEIGHT = -10f;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	
 	public Transform transform;

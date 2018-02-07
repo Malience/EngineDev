@@ -1,5 +1,6 @@
 package com.base.engine.rendering.opengl;
 
+import com.base.engine.data.Material;
 import com.base.engine.data.Mesh;
 
 public class MeshRenderer {

@@ -5,6 +5,7 @@ public class Time {
 	private static final float INV_SECOND = 1.0f / (float) SECOND;
 	
 	private static float last, delta;
+	private static int frames;
 	
 	static { last = getTime(); }
 	
@@ -17,4 +18,8 @@ public class Time {
 		last = time;
 		return delta;
 	}
+	
+	public static int getFrames() {return frames;}
+	public static void incrementFrames() {frames++;}
+	public static void resetFrames() {frames = 0;}
 }

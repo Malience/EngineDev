@@ -43,7 +43,6 @@ public class CoreEngine implements Engine {
 	
 	public void run() {
 		running = true;
-		int frames = 0;
 		float frameTime = 1.0f / framesPerSecond;
 		float delta, unprocessedTime = 0f, frameCounter = 0f;;
 		//glfwFreeCallbacks(window);
@@ -61,7 +60,7 @@ public class CoreEngine implements Engine {
 				unprocessedTime -= frameTime;
 				if(frameCounter >= 1.0) {
 					//System.out.println(frames);
-					frames = 0;
+					Time.resetFrames();
 					frameCounter = 0;
 				}	
 			}
@@ -70,7 +69,7 @@ public class CoreEngine implements Engine {
 				GLFWWindow.pollEvents();
 				
 				for(int i = 0; i < engines.length; i++) engines[i].run();
-				frames++;}
+				Time.incrementFrames();}
 			else{try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 		}
 		this.dispose();

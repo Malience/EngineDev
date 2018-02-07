@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-import com.base.engine.rendering.Vertex;
 import math.Matrix4f;
 import math.Vector3f;
 
@@ -51,35 +50,7 @@ public abstract class Util
 		buffer.put(m.m10); buffer.put(m.m11); buffer.put(m.m12); buffer.put(m.m13);
 		buffer.put(m.m20); buffer.put(m.m21); buffer.put(m.m22); buffer.put(m.m23);
 		buffer.put(m.m30); buffer.put(m.m31); buffer.put(m.m32); buffer.put(m.m33);
-		
-//		buffer.put(m.m00); buffer.put(m.m10); buffer.put(m.m20); buffer.put(m.m30);
-//		buffer.put(m.m01); buffer.put(m.m11); buffer.put(m.m21); buffer.put(m.m31);
-//		buffer.put(m.m02); buffer.put(m.m12); buffer.put(m.m22); buffer.put(m.m32);
-//		buffer.put(m.m03); buffer.put(m.m13); buffer.put(m.m23); buffer.put(m.m33);
-		//buffer.flip();
 	}
-	
-	public static FloatBuffer createFlippedBuffer(Vertex[] vertices)
-	{
-		FloatBuffer buffer = createFloatBuffer(vertices.length * Vertex.SIZE);
-		
-		for(int i = 0; i < vertices.length; i++)
-		{
-			buffer.put((float) vertices[i].getPos().x);
-			buffer.put((float) vertices[i].getPos().y);
-			buffer.put((float) vertices[i].getPos().z);
-			buffer.put((float) vertices[i].getTexCoord().x);
-			buffer.put((float) vertices[i].getTexCoord().y);
-			buffer.put((float) vertices[i].getNormal().x);
-			buffer.put((float) vertices[i].getNormal().y);
-			buffer.put((float) vertices[i].getNormal().z);
-		}
-		
-		buffer.flip();
-		
-		return buffer;
-	}
-	
 	
 	public static FloatBuffer matricesToFloatBuffer(Matrix4f[] matrices) 
 	{

@@ -12,11 +12,12 @@ import org.lwjgl.opengl.GL30;
 
 import math.Matrix4f;
 
-public class Skybox extends GLPass{
+//TODO: Turn into a real renderer
+public class Skybox {
 	int texture, mesh;
+	int shader;
 	
 	public Skybox(int shader, int texture) {
-		super(0, 0, shader);
 		this.texture = texture;
 		mesh = GLVertexArray.genVertexArray();
 		GLVertexArray.setUpVertexArray(mesh, skyboxVertices);
@@ -26,7 +27,7 @@ public class Skybox extends GLPass{
 		glDepthFunc(GL_LEQUAL);
 		GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, framebuffer);
 		GLShader.bindProgram(shader);
-		GLShader.setUniformMat4(this.view, view);
+		GLShader.setUniformMat4(shader, "view", view);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texture);
 		GLVertexArray.bindVertexArray(mesh);

@@ -3,10 +3,7 @@ package com.base.engine.rendering.opengl;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
-import java.util.Scanner;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -15,10 +12,6 @@ import org.lwjgl.opengl.GL32;
 
 import com.base.engine.core.util.Util;
 import com.base.engine.rendering.DirectionalLight;
-import com.base.engine.rendering.GLFWWindow;
-import com.base.engine.rendering.Light;
-import com.base.engine.rendering.Material;
-import com.base.engine.rendering.MaterialMap;
 import com.base.engine.rendering.PointLight;
 import com.base.engine.rendering.SpotLight;
 import math.Matrix4f;
@@ -148,29 +141,29 @@ public abstract class GLShader {
 		return shader;
 	}
 	
-	
-	public static void bindMaterial(int program, MaterialMap mat){
-		if(mat.diffuse >= 0){
-			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.diffuse);
-			setUniform(program, "material.diffuse", 0);
-			if(mat.specular >= 0){
-				GL13.glActiveTexture(GL13.GL_TEXTURE1);
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.specular);
-				setUniform(program, "material.specular", 1);
-			} else setUniform(program, "material.specular", 0);
-		}
-		//setUniform(program, "material.shininess", mat.shininess);
-	}
-	
-	public static void setMaterial(int program, Material mat){
-		setUniformVec3(program, "material.ambient", mat.ambient);
-		setUniformVec3(program, "material.diffuse", mat.diffuse);
-		setUniformVec3(program, "material.specular", mat.specular);
-		setUniform(program, "material.shininess", mat.shininess);
-		
-		if(mat.textures != null)GLShader.bindTexture(program, mat.textures); 
-	}
+	//TODO: Delete
+//	public static void bindMaterial(int program, MaterialMap mat){
+//		if(mat.diffuse >= 0){
+//			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+//			GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.diffuse);
+//			setUniform(program, "material.diffuse", 0);
+//			if(mat.specular >= 0){
+//				GL13.glActiveTexture(GL13.GL_TEXTURE1);
+//				GL11.glBindTexture(GL11.GL_TEXTURE_2D, mat.specular);
+//				setUniform(program, "material.specular", 1);
+//			} else setUniform(program, "material.specular", 0);
+//		}
+//		//setUniform(program, "material.shininess", mat.shininess);
+//	}
+//	
+//	public static void setMaterial(int program, Material mat){
+//		setUniformVec3(program, "material.ambient", mat.ambient);
+//		setUniformVec3(program, "material.diffuse", mat.diffuse);
+//		setUniformVec3(program, "material.specular", mat.specular);
+//		setUniform(program, "material.shininess", mat.shininess);
+//		
+//		if(mat.textures != null)GLShader.bindTexture(program, mat.textures); 
+//	}
 	
 	public static void setMaterial(int program, float[] ambient, float[] diffuse, float[] specular, float shininess){
 		setUniformVec3(program, "material.ambient", ambient);
@@ -184,20 +177,6 @@ public abstract class GLShader {
 		setUniformVec3(program, "material.diffuse", material[3], material[4], material[5]);
 		setUniformVec3(program, "material.specular", material[6], material[7], material[8]);
 		setUniform(program, "material.shininess", material[9]);
-	}
-	
-	public static void setLight(int program, Light light){
-		setUniformVec3(program, "light.position", light.pos);
-		setUniformVec3(program, "light.ambient", light.ambient);
-		setUniformVec3(program, "light.diffuse", light.diffuse);
-		setUniformVec3(program, "light.specular", light.specular);
-	}
-	
-	public static void setLight(int program, float[] position, float[] ambient, float[] diffuse, float[] specular){
-		setUniformVec3(program, "light.position", position);
-		setUniformVec3(program, "light.ambient", ambient);
-		setUniformVec3(program, "light.diffuse", diffuse);
-		setUniformVec3(program, "light.specular", specular);
 	}
 	
 	public static void setLight(int program, DirectionalLight light){
