@@ -8,7 +8,7 @@ The main driving force behind EngineDev 2 was to improve upon the underlaying st
 
 Near the end of this project's development I was beginning to test Tiled Forward Rendering and VR compatability.
 
-This project was eventually abandonned to work on EngineDev 2.2.
+This project was eventually abandoned to work on EngineDev 2.2.
 
 ## Features
 * Input Engine (Mouse, Keyboard, and Joystick controls)
