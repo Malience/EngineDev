@@ -29,4 +29,4 @@ This project was eventually abandonned to work on EngineDev 2.2.
 ![Water Test Example](https://github.com/MasterMatthew/EngineDev/blob/master/EngineWaterTest.gif)
 
 To view an interactive demo, check here:
-https://github.com/MasterMatthew/EngineDev/releases
+https://github.com/Malience/EngineDev/releases
